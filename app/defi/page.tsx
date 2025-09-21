@@ -22,6 +22,7 @@ import {
   Sparkles,
   ArrowUpRight,
   DollarSign,
+  Plus,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -36,44 +37,49 @@ export default function DeFiPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 pt-24 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-8"
+          className="mb-12"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent mb-4">
-                DeFi Travel Hub
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Earn while you save for your next adventure across multiple blockchains
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-muted-foreground">Next Trip Goal</div>
-              <div className="text-2xl font-bold text-primary">${travelGoal.toLocaleString()}</div>
-            </div>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent mb-4">
+              DeFi Travel Hub
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Earn while you save for your next adventure across multiple blockchains with high-yield staking and farming
+            </p>
           </div>
 
-          <Card className="p-6 mb-8 bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/20 rounded-lg">
-                  <Target className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Dream Trip to Japan</h3>
-                  <p className="text-sm text-muted-foreground">2 weeks • Cherry Blossom Season</p>
-                </div>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+            <div className="flex items-center justify-center md:justify-start gap-4">
+              <div className="flex items-center gap-2">
+                <Target className="h-6 w-6 text-primary" />
+                <span className="font-semibold text-xl">Dream Trip to Japan</span>
               </div>
+              <div className="text-lg text-muted-foreground">${totalSavings.toLocaleString()} saved</div>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <div className="text-sm text-muted-foreground">Goal: ${travelGoal.toLocaleString()}</div>
               <Badge variant="secondary" className="bg-green-500/20 text-green-700">
                 {Math.round(savingsProgress)}% Complete
               </Badge>
             </div>
-            <div className="space-y-3">
+          </div>
+
+          <Card className="p-6 mb-8 bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <PiggyBank className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Travel Savings Progress</h3>
+                <p className="text-sm text-muted-foreground">2 weeks in Japan • Cherry Blossom Season</p>
+              </div>
+            </div>
+            <div className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span>
                   Progress: ${totalSavings.toLocaleString()} / ${travelGoal.toLocaleString()}
@@ -81,15 +87,25 @@ export default function DeFiPage() {
                 <span className="text-green-600 font-medium">+${monthlyContribution}/month</span>
               </div>
               <Progress value={savingsProgress} className="h-3" />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Started 8 months ago</span>
-                <span>Est. completion: 14 months</span>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="text-center">
+                  <div className="text-muted-foreground">Started</div>
+                  <div className="font-medium">8 months ago</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-muted-foreground">Monthly APY</div>
+                  <div className="font-medium text-green-600">18.7%</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-muted-foreground">Est. completion</div>
+                  <div className="font-medium">6 months</div>
+                </div>
               </div>
             </div>
           </Card>
         </motion.div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-8">
           <TabsList className="grid w-full grid-cols-5 h-12 bg-muted/50">
             <TabsTrigger
               value="overview"
@@ -110,14 +126,14 @@ export default function DeFiPage() {
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Coins className="h-4 w-4" />
-              Yield Farming
+              Farming
             </TabsTrigger>
             <TabsTrigger
               value="savings"
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <PiggyBank className="h-4 w-4" />
-              Travel Savings
+              Savings
             </TabsTrigger>
             <TabsTrigger
               value="bridge"
@@ -141,7 +157,19 @@ export default function DeFiPage() {
           </TabsContent>
 
           <TabsContent value="savings">
-            <div className="grid gap-6">
+            <div className="space-y-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-8"
+              >
+                <h2 className="text-3xl font-bold mb-4">Smart Travel Savings</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Maximize your travel fund with automated DeFi strategies designed for adventurers
+                </p>
+              </motion.div>
+
               <div className="grid md:grid-cols-3 gap-6">
                 <Card className="p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -179,36 +207,105 @@ export default function DeFiPage() {
                     <ArrowUpRight className="h-4 w-4 text-green-600" />
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Monthly APY</p>
+                    <p className="text-sm text-muted-foreground">Average APY</p>
                     <p className="text-2xl font-bold">18.7%</p>
                     <p className="text-xs text-green-600">Compound interest</p>
                   </div>
                 </Card>
               </div>
 
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Travel Savings Strategies</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Conservative Saver</h4>
-                    <p className="text-sm text-muted-foreground mb-3">Low risk, steady returns</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">8-12% APY</span>
-                      <Button size="sm" variant="outline">
-                        Select
-                      </Button>
+              <div className="grid lg:grid-cols-2 gap-8">
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-6">Travel Savings Strategies</h3>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Conservative Saver</h4>
+                        <Badge variant="outline">8-12% APY</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">Low risk, steady returns with stable coins</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted-foreground">Risk Level: Low</span>
+                        <Button size="sm" variant="outline">
+                          Select Plan
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg bg-primary/5 border-primary/20">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Adventure Seeker</h4>
+                        <Badge className="bg-primary text-primary-foreground">15-25% APY</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">Higher risk, maximum rewards with yield farming</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted-foreground">Risk Level: High</span>
+                        <Button size="sm">Current Plan</Button>
+                      </div>
+                    </div>
+
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Balanced Explorer</h4>
+                        <Badge variant="secondary">12-18% APY</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">Moderate risk with diversified portfolio</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted-foreground">Risk Level: Medium</span>
+                        <Button size="sm" variant="outline">
+                          Switch Plan
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <div className="p-4 border rounded-lg bg-primary/5 border-primary/20">
-                    <h4 className="font-medium mb-2">Adventure Seeker</h4>
-                    <p className="text-sm text-muted-foreground mb-3">Higher risk, maximum rewards</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">15-25% APY</span>
-                      <Button size="sm">Current Plan</Button>
+                </Card>
+
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-6">Savings Goals</h3>
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Japan Trip</span>
+                        <span className="text-sm text-muted-foreground">${Math.round(savingsProgress)}%</span>
+                      </div>
+                      <Progress value={savingsProgress} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>${totalSavings.toLocaleString()}</span>
+                        <span>${travelGoal.toLocaleString()}</span>
+                      </div>
                     </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Europe Backpacking</span>
+                        <span className="text-sm text-muted-foreground">25%</span>
+                      </div>
+                      <Progress value={25} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>$3,750</span>
+                        <span>$15,000</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Safari Adventure</span>
+                        <span className="text-sm text-muted-foreground">10%</span>
+                      </div>
+                      <Progress value={10} className="h-2" />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>$2,000</span>
+                        <span>$20,000</span>
+                      </div>
+                    </div>
+
+                    <Button className="w-full mt-4" variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add New Goal
+                    </Button>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
           </TabsContent>
 

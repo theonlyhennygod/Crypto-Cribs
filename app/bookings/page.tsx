@@ -154,33 +154,34 @@ export default function BookingsPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-blue-500/5">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 pt-24 pb-16">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-4">
-                My Journeys
-              </h1>
-              <p className="text-xl text-muted-foreground">Track and manage your travel adventures</p>
-            </div>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-blue-600">{mockBookings.length}</div>
-                <div className="text-sm text-muted-foreground">Total Trips</div>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-4">
+              My Journeys
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Track and manage your travel adventures across the blockchain
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card className="p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">{mockBookings.length}</div>
+              <div className="text-sm text-muted-foreground">Total Trips</div>
+            </Card>
+            <Card className="p-6 text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">
+                {mockBookings.filter((b) => b.status === "completed").length}
               </div>
-              <div>
-                <div className="text-2xl font-bold text-green-600">
-                  {mockBookings.filter((b) => b.status === "completed").length}
-                </div>
-                <div className="text-sm text-muted-foreground">Completed</div>
+              <div className="text-sm text-muted-foreground">Completed</div>
+            </Card>
+            <Card className="p-6 text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">
+                {mockBookings.reduce((sum, b) => sum + b.carbonOffset, 0).toFixed(1)}t
               </div>
-              <div>
-                <div className="text-2xl font-bold text-orange-600">
-                  {mockBookings.reduce((sum, b) => sum + b.carbonOffset, 0).toFixed(1)}t
-                </div>
-                <div className="text-sm text-muted-foreground">CO₂ Offset</div>
-              </div>
-            </div>
+              <div className="text-sm text-muted-foreground">CO₂ Offset</div>
+            </Card>
           </div>
 
           <Card className="p-6 mb-6">
@@ -205,14 +206,14 @@ export default function BookingsPage() {
             </div>
           </Card>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
             <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/50">
               <TabsTrigger
                 value="all"
                 className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white"
               >
                 <Calendar className="h-4 w-4" />
-                All Bookings ({mockBookings.length})
+                All ({mockBookings.length})
               </TabsTrigger>
               <TabsTrigger
                 value="upcoming"

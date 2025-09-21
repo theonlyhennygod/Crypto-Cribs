@@ -67,14 +67,57 @@ const initialState: WalletState = {
 // Wallet Provider Component
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>(initialState)
+  const [detectedProviders, setDetectedProviders] = useState<Map<string, EIP6963ProviderDetail>>(new Map())
 
-  // MetaMask connection
+  // EIP-6963 wallet detection
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleAnnounceProvider = (event: EIP6963AnnounceProviderEvent) => {
+      setDetectedProviders(prev => new Map(prev).set(event.detail.info.uuid, event.detail))
+    }
+
+    window.addEventListener("eip6963:announceProvider", handleAnnounceProvider)
+    window.dispatchEvent(new Event("eip6963:requestProvider"))
+
+    return () => {
+      window.removeEventListener("eip6963:announceProvider", handleAnnounceProvider)
+    }
+  }, [])
+
+  // MetaMask connection using EIP-6963
   const connectMetaMask = async () => {
     try {
       setState((prev) => ({ ...prev, connectionStatus: "connecting", error: null }))
 
-      if (!window.ethereum) {
-        throw new Error("MetaMask not installed. Please install MetaMask browser extension.")
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') {
+        throw new Error("Not in browser environment")
+      }
+
+      // Try to find MetaMask provider using EIP-6963
+      let provider: EIP1193Provider | undefined
+      
+      // Look for MetaMask in detected providers first
+      for (const [uuid, providerDetail] of detectedProviders) {
+        if (providerDetail.info.name.toLowerCase().includes('metamask')) {
+          provider = providerDetail.provider
+          break
+        }
+      }
+
+      // Fallback to window.ethereum if EIP-6963 detection didn't work
+      if (!provider && window.ethereum) {
+        provider = window.ethereum
+      }
+
+      if (!provider) {
+        throw new Error("MetaMask not detected. Please install MetaMask browser extension.")
+      }
+
+      // Check if provider is ready
+      if (!provider.request) {
+        throw new Error("MetaMask provider not ready. Please refresh and try again.")
       }
 
       // Add timeout to prevent hanging
@@ -82,12 +125,24 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setTimeout(() => reject(new Error("Connection timeout - please try again")), 15000)
       )
 
-      // Request account access with timeout
-      const accountsPromise = window.ethereum.request({
+      // Request account access with proper error handling
+      const accountsPromise = provider.request({
         method: "eth_requestAccounts",
+      }).catch((error: any) => {
+        console.error("MetaMask connection error:", error)
+        if (error.code === 4001) {
+          throw new Error("Connection rejected by user")
+        } else if (error.code === -32002) {
+          throw new Error("MetaMask is already processing a request. Please check MetaMask.")
+        } else if (error.code === -32603) {
+          throw new Error("MetaMask internal error. Please close and reopen MetaMask, then try again.")
+        } else if (error.message && error.message.includes("User rejected")) {
+          throw new Error("Connection rejected by user")
+        }
+        throw new Error(`MetaMask error: ${error.message || "Unknown error"}`)
       })
 
-      const accounts = await Promise.race([accountsPromise, timeout])
+      const accounts = await Promise.race([accountsPromise, timeout]) as string[]
 
       if (!accounts || accounts.length === 0) {
         throw new Error("No accounts found - please unlock MetaMask")
@@ -95,14 +150,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       // Switch to Flare Network (Chain ID: 14)
       try {
-        await window.ethereum.request({
+        await provider.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: "0xe" }], // 14 in hex
         })
       } catch (switchError: any) {
         // If network doesn't exist, add it
         if (switchError.code === 4902) {
-          await window.ethereum.request({
+          await provider.request({
             method: "wallet_addEthereumChain",
             params: [
               {
@@ -121,14 +176,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Get balance with timeout
-      const balancePromise = window.ethereum.request({
+      // Get balance with timeout and error handling
+      const balancePromise = provider.request({
         method: "eth_getBalance",
         params: [accounts[0], "latest"],
+      }).catch((error: any) => {
+        if (error.code === -32603) {
+          throw new Error("Failed to get balance. Please refresh and try again.")
+        }
+        throw error
       })
 
       const balance = await Promise.race([balancePromise, timeout])
-      const balanceInEth = (Number.parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4)
+      const balanceInEth = balance ? (Number.parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4) : "0.0000"
 
       setState((prev) => ({
         ...prev,
@@ -154,9 +214,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       setState((prev) => ({ ...prev, connectionStatus: "connecting", error: null }))
 
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') {
+        throw new Error("Not in browser environment")
+      }
+
       // Check if Gem Wallet is installed
       if (!window.gemWallet) {
         throw new Error("Gem Wallet not installed. Please install the Gem Wallet browser extension.")
+      }
+
+      // Check if gem wallet provider is ready
+      if (!window.gemWallet.request) {
+        throw new Error("Gem Wallet provider not ready. Please refresh and try again.")
       }
 
       // Add timeout to prevent hanging
@@ -164,10 +234,22 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setTimeout(() => reject(new Error("Connection timeout - please try again")), 15000)
       )
 
-      // Request connection with timeout
+      // Request connection with timeout and error handling
       const responsePromise = window.gemWallet.request({
         method: "wallet_requestPermissions",
         params: [{ wallet_selection: { network: "XRPL" } }],
+      }).catch((error: any) => {
+        console.error("Gem Wallet connection error:", error)
+        if (error.code === 4001) {
+          throw new Error("Connection rejected by user")
+        } else if (error.code === -32002) {
+          throw new Error("Gem Wallet is already processing a request. Please check Gem Wallet.")
+        } else if (error.code === -32603) {
+          throw new Error("Gem Wallet internal error. Please close and reopen Gem Wallet, then try again.")
+        } else if (error.message && error.message.includes("User rejected")) {
+          throw new Error("Connection rejected by user")
+        }
+        throw new Error(`Gem Wallet error: ${error.message || "Unknown error"}`)
       })
 
       const response = await Promise.race([responsePromise, timeout])
@@ -176,10 +258,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         throw new Error("Connection rejected or failed")
       }
 
-      // Get account info with timeout
+      // Get account info with timeout and error handling
       const accountInfoPromise = window.gemWallet.request({
         method: "account_info",
         params: {},
+      }).catch((error: any) => {
+        if (error.code === -32603) {
+          throw new Error("Failed to get account info. Please refresh and try again.")
+        }
+        throw error
       })
 
       const accountInfo = await Promise.race([accountInfoPromise, timeout])
@@ -349,6 +436,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, error: null }))
   }
 
+  // Reset connection state
+  const resetConnection = () => {
+    setState((prev) => ({
+      ...prev,
+      connectionStatus: "disconnected",
+      error: null,
+    }))
+  }
+
   // Connection timeout reset
   useEffect(() => {
     if (state.connectionStatus === "connecting") {
@@ -366,29 +462,53 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   // Listen for account changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ethereum) {
+    if (typeof window !== 'undefined' && window.ethereum && window.ethereum.on) {
       const handleAccountsChanged = (accounts: string[]) => {
-        if (accounts.length === 0) {
-          disconnectWallet("metamask")
-        } else if (state.metamaskConnected) {
-          setState((prev) => ({
-            ...prev,
-            metamaskAddress: accounts[0],
-            flareWallet: prev.flareWallet ? { ...prev.flareWallet, address: accounts[0] } : null,
-          }))
+        try {
+          if (accounts.length === 0) {
+            disconnectWallet("metamask")
+          } else if (state.metamaskConnected) {
+            setState((prev) => ({
+              ...prev,
+              metamaskAddress: accounts[0],
+              flareWallet: prev.flareWallet ? { ...prev.flareWallet, address: accounts[0] } : null,
+            }))
+          }
+        } catch (error) {
+          console.error("Error handling account change:", error)
         }
       }
 
       const handleChainChanged = () => {
-        window.location.reload()
+        try {
+          window.location.reload()
+        } catch (error) {
+          console.error("Error handling chain change:", error)
+        }
+      }
+
+      const handleDisconnect = () => {
+        try {
+          disconnectWallet("metamask")
+        } catch (error) {
+          console.error("Error handling disconnect:", error)
+        }
       }
 
       window.ethereum.on("accountsChanged", handleAccountsChanged)
       window.ethereum.on("chainChanged", handleChainChanged)
+      window.ethereum.on("disconnect", handleDisconnect)
 
       return () => {
-        window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
-        window.ethereum.removeListener("chainChanged", handleChainChanged)
+        try {
+          if (window.ethereum && window.ethereum.removeListener) {
+            window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
+            window.ethereum.removeListener("chainChanged", handleChainChanged)
+            window.ethereum.removeListener("disconnect", handleDisconnect)
+          }
+        } catch (error) {
+          console.error("Error removing event listeners:", error)
+        }
       }
     }
   }, [state.metamaskConnected])
@@ -418,10 +538,48 @@ export function useWallet() {
   return context
 }
 
+// EIP-6963 interfaces for proper wallet detection
+interface EIP6963ProviderInfo {
+  rdns: string
+  uuid: string
+  name: string
+  icon: string
+}
+
+interface EIP6963ProviderDetail {
+  info: EIP6963ProviderInfo
+  provider: EIP1193Provider
+}
+
+type EIP6963AnnounceProviderEvent = {
+  detail: {
+    info: EIP6963ProviderInfo
+    provider: Readonly<EIP1193Provider>
+  }
+}
+
+interface EIP1193Provider {
+  isStatus?: boolean
+  host?: string
+  path?: string
+  sendAsync?: (
+    request: { method: string; params?: Array<unknown> },
+    callback: (error: Error | null, response: unknown) => void
+  ) => void
+  send?: (
+    request: { method: string; params?: Array<unknown> },
+    callback: (error: Error | null, response: unknown) => void
+  ) => void
+  request: (request: { method: string; params?: Array<unknown> }) => Promise<unknown>
+}
+
 // Type declarations for window objects
 declare global {
   interface Window {
-    ethereum?: any
+    ethereum?: EIP1193Provider
     gemWallet?: any
+  }
+  interface WindowEventMap {
+    "eip6963:announceProvider": CustomEvent
   }
 }

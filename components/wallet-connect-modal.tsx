@@ -67,8 +67,25 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="flex items-center justify-between">
                 <span>{error}</span>
-                <Button size="sm" variant="outline" onClick={clearError}>
-                  Retry
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={clearError}>
+                    Dismiss
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+                    Reset
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {connectionStatus === "connecting" && (
+            <Alert>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>Connecting to wallet... This may take a moment.</span>
+                <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+                  Reset Connection
                 </Button>
               </AlertDescription>
             </Alert>

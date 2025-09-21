@@ -9,6 +9,8 @@ import { Progress } from "@/components/ui/progress"
 import { Navigation } from "@/components/navigation"
 import { NFTGallery } from "@/components/nft-gallery"
 import { LoyaltyRewards } from "@/components/loyalty-rewards"
+import { DailyRaffleCard } from "@/components/daily-raffle-card"
+import { RaffleHistory } from "@/components/raffle-history"
 import { Gift, Crown, Star, Zap, Trophy, Medal, Sparkles, MapPin, Calendar, Users, Flame, Award } from "lucide-react"
 import { useState } from "react"
 
@@ -24,53 +26,52 @@ export default function RewardsPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-purple-500/5">
       <Navigation />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-6 pt-24 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-8"
+          className="mb-12"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                Rewards Universe
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Collect exclusive NFTs, earn loyalty points, and unlock premium travel experiences
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="h-5 w-5 text-yellow-500" />
-                <span className="font-semibold text-lg">{currentTier}</span>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              Rewards Universe
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Collect exclusive NFTs, earn loyalty points, win daily prizes, and unlock premium travel experiences
+            </p>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+            <div className="flex items-center justify-center md:justify-start gap-4">
+              <div className="flex items-center gap-2">
+                <Crown className="h-6 w-6 text-yellow-500" />
+                <span className="font-semibold text-xl">{currentTier}</span>
               </div>
-              <div className="text-sm text-muted-foreground">{loyaltyPoints.toLocaleString()} points</div>
+              <div className="text-lg text-muted-foreground">{loyaltyPoints.toLocaleString()} points</div>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-500" />
+                <span className="text-sm font-medium">{streakDays} day streak</span>
+              </div>
+              <Badge variant="secondary" className="bg-purple-500/20 text-purple-700">
+                {Math.round(tierProgress)}% to next tier
+              </Badge>
             </div>
           </div>
 
           <Card className="p-6 mb-8 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <Trophy className="h-6 w-6 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Next Tier: Adventurer</h3>
-                  <p className="text-sm text-muted-foreground">Unlock exclusive perks & higher rewards</p>
-                </div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-500/20 rounded-lg">
+                <Trophy className="h-6 w-6 text-purple-600" />
               </div>
-              <div className="text-right">
-                <div className="flex items-center gap-2 mb-1">
-                  <Flame className="h-4 w-4 text-orange-500" />
-                  <span className="text-sm font-medium">{streakDays} day streak</span>
-                </div>
-                <Badge variant="secondary" className="bg-purple-500/20 text-purple-700">
-                  {Math.round(tierProgress)}% to next tier
-                </Badge>
+              <div>
+                <h3 className="text-lg font-semibold">Next Tier: Adventurer</h3>
+                <p className="text-sm text-muted-foreground">Unlock exclusive perks & higher rewards</p>
               </div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex justify-between text-sm">
                 <span>
                   Progress: {loyaltyPoints.toLocaleString()} / {nextTierPoints.toLocaleString()} points
@@ -78,17 +79,17 @@ export default function RewardsPage() {
                 <span className="text-purple-600 font-medium">+{nextTierPoints - loyaltyPoints} needed</span>
               </div>
               <Progress value={tierProgress} className="h-3" />
-              <div className="grid grid-cols-3 gap-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Star className="h-3 w-3" />
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Star className="h-4 w-4" />
                   <span>12 trips completed</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Users className="h-3 w-3" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="h-4 w-4" />
                   <span>8 referrals</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Award className="h-3 w-3" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Award className="h-4 w-4" />
                   <span>5 NFTs earned</span>
                 </div>
               </div>
@@ -96,21 +97,28 @@ export default function RewardsPage() {
           </Card>
         </motion.div>
 
-        <Tabs defaultValue="loyalty" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 h-12 bg-muted/50">
+        <Tabs defaultValue="raffle" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-5 h-12 bg-muted/50">
+            <TabsTrigger
+              value="raffle"
+              className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+            >
+              <Trophy className="h-4 w-4" />
+              Daily Raffle
+            </TabsTrigger>
             <TabsTrigger
               value="loyalty"
               className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
             >
               <Crown className="h-4 w-4" />
-              Loyalty Program
+              Loyalty
             </TabsTrigger>
             <TabsTrigger
               value="nfts"
               className="flex items-center gap-2 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
             >
               <Gift className="h-4 w-4" />
-              NFT Collection
+              NFTs
             </TabsTrigger>
             <TabsTrigger
               value="achievements"
@@ -127,6 +135,81 @@ export default function RewardsPage() {
               Marketplace
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="raffle">
+            <div className="space-y-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center mb-8"
+              >
+                <h2 className="text-3xl font-bold mb-4">Win Amazing Travel Experiences</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Contribute to our liquidity pools daily for chances to win free vacations, luxury retreats, and exclusive NFTs.
+                </p>
+              </motion.div>
+              
+              <div className="grid lg:grid-cols-2 gap-8">
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
+                  <DailyRaffleCard />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  <RaffleHistory />
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="mt-12"
+              >
+                <div className="bg-card border border-border rounded-2xl p-8">
+                  <h3 className="text-2xl font-bold text-center mb-8">How the Raffle Works</h3>
+                  <div className="grid md:grid-cols-4 gap-6">
+                    <div className="text-center space-y-3">
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+                        <span className="text-primary font-bold">1</span>
+                      </div>
+                      <h4 className="font-semibold">Contribute</h4>
+                      <p className="text-sm text-muted-foreground">Add XRP or FLR to the daily liquidity pool</p>
+                    </div>
+                    <div className="text-center space-y-3">
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+                        <span className="text-primary font-bold">2</span>
+                      </div>
+                      <h4 className="font-semibold">Earn Tickets</h4>
+                      <p className="text-sm text-muted-foreground">Get 1 raffle ticket per 5 tokens contributed</p>
+                    </div>
+                    <div className="text-center space-y-3">
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+                        <span className="text-primary font-bold">3</span>
+                      </div>
+                      <h4 className="font-semibold">Wait for Draw</h4>
+                      <p className="text-sm text-muted-foreground">Winners selected daily at midnight UTC</p>
+                    </div>
+                    <div className="text-center space-y-3">
+                      <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
+                        <span className="text-primary font-bold">4</span>
+                      </div>
+                      <h4 className="font-semibold">Claim Prize</h4>
+                      <p className="text-sm text-muted-foreground">Winners receive prizes automatically via smart contract</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="loyalty">
             <LoyaltyRewards />
