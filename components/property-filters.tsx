@@ -1,34 +1,42 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Search, Filter, X, MapPin, Calendar, Users, ChevronDown } from "lucide-react"
-import { useState } from "react"
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import {
+  Search,
+  Filter,
+  X,
+  MapPin,
+  Calendar,
+  Users,
+  ChevronDown,
+} from "lucide-react";
+import { useState } from "react";
 
 interface FilterState {
-  location: string
-  checkIn: string
-  checkOut: string
-  guests: number
-  priceRange: [number, number]
-  currency: "XRP" | "FLR" | "both"
-  propertyTypes: string[]
-  amenities: string[]
+  location: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  priceRange: [number, number];
+  currency: "XRP" | "FLR" | "both";
+  propertyTypes: string[];
+  amenities: string[];
 }
 
 interface PropertyFiltersProps {
-  onFiltersChange: (filters: FilterState) => void
+  onFiltersChange: (filters: FilterState) => void;
 }
 
 export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
-  const [showAdvanced, setShowAdvanced] = useState(false)
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     location: "",
     checkIn: "",
@@ -38,12 +46,12 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
     currency: "both",
     propertyTypes: [],
     amenities: [],
-  })
+  });
 
   const availableLocations = [
     "Maldives",
     "Maldives, Indian Ocean",
-    "Tokyo, Japan", 
+    "Tokyo, Japan",
     "Swiss Alps",
     "Swiss Alps, Switzerland",
     "Barcelona, Spain",
@@ -64,10 +72,17 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
     "Philadelphia, PA",
     "Malibu, CA",
     "Aspen, CO",
-    "Zermatt, Switzerland"
-  ]
+    "Zermatt, Switzerland",
+  ];
 
-  const propertyTypes = ["Apartment", "House", "Villa", "Condo", "Loft", "Studio"]
+  const propertyTypes = [
+    "Apartment",
+    "House",
+    "Villa",
+    "Condo",
+    "Loft",
+    "Studio",
+  ];
 
   const amenities = [
     "WiFi",
@@ -80,13 +95,13 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
     "Heating",
     "Washer",
     "Dryer",
-  ]
+  ];
 
   const updateFilters = (newFilters: Partial<FilterState>) => {
-    const updated = { ...filters, ...newFilters }
-    setFilters(updated)
-    onFiltersChange(updated)
-  }
+    const updated = { ...filters, ...newFilters };
+    setFilters(updated);
+    onFiltersChange(updated);
+  };
 
   const clearFilters = () => {
     const cleared: FilterState = {
@@ -98,33 +113,33 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
       currency: "both",
       propertyTypes: [],
       amenities: [],
-    }
-    setFilters(cleared)
-    onFiltersChange(cleared)
-  }
+    };
+    setFilters(cleared);
+    onFiltersChange(cleared);
+  };
 
   const togglePropertyType = (type: string) => {
     const updated = filters.propertyTypes.includes(type)
       ? filters.propertyTypes.filter((t) => t !== type)
-      : [...filters.propertyTypes, type]
-    updateFilters({ propertyTypes: updated })
-  }
+      : [...filters.propertyTypes, type];
+    updateFilters({ propertyTypes: updated });
+  };
 
   const toggleAmenity = (amenity: string) => {
     const updated = filters.amenities.includes(amenity)
       ? filters.amenities.filter((a) => a !== amenity)
-      : [...filters.amenities, amenity]
-    updateFilters({ amenities: updated })
-  }
+      : [...filters.amenities, amenity];
+    updateFilters({ amenities: updated });
+  };
 
   const selectLocation = (location: string) => {
-    updateFilters({ location })
-    setShowLocationDropdown(false)
-  }
+    updateFilters({ location });
+    setShowLocationDropdown(false);
+  };
 
-  const filteredLocations = availableLocations.filter(location =>
+  const filteredLocations = availableLocations.filter((location) =>
     location.toLowerCase().includes(filters.location.toLowerCase())
-  )
+  );
 
   return (
     <div className="space-y-6">
@@ -143,12 +158,16 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
                 value={filters.location}
                 onChange={(e) => updateFilters({ location: e.target.value })}
                 onFocus={() => setShowLocationDropdown(true)}
-                onBlur={() => setTimeout(() => setShowLocationDropdown(false), 200)}
+                onBlur={() =>
+                  setTimeout(() => setShowLocationDropdown(false), 200)
+                }
                 className="pl-10 pr-10"
               />
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer" 
-                onClick={() => setShowLocationDropdown(!showLocationDropdown)} />
-              
+              <ChevronDown
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer"
+                onClick={() => setShowLocationDropdown(!showLocationDropdown)}
+              />
+
               {/* Location Dropdown */}
               {showLocationDropdown && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
@@ -217,7 +236,11 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
                 min="1"
                 max="16"
                 value={filters.guests}
-                onChange={(e) => updateFilters({ guests: Number.parseInt(e.target.value) || 1 })}
+                onChange={(e) =>
+                  updateFilters({
+                    guests: Number.parseInt(e.target.value) || 1,
+                  })
+                }
                 className="pl-10"
               />
             </div>
@@ -225,13 +248,21 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
         </div>
 
         <div className="flex items-center justify-between mt-6">
-          <Button variant="outline" onClick={() => setShowAdvanced(!showAdvanced)} className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-2"
+          >
             <Filter className="h-4 w-4" />
             Advanced Filters
           </Button>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={clearFilters} className="text-muted-foreground">
+            <Button
+              variant="ghost"
+              onClick={clearFilters}
+              className="text-muted-foreground"
+            >
               Clear All
             </Button>
             <Button className="bg-primary hover:bg-primary/90">
@@ -260,7 +291,11 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
                   </Badge>
                   <select
                     value={filters.currency}
-                    onChange={(e) => updateFilters({ currency: e.target.value as "XRP" | "FLR" | "both" })}
+                    onChange={(e) =>
+                      updateFilters({
+                        currency: e.target.value as "XRP" | "FLR" | "both",
+                      })
+                    }
                     className="text-xs bg-background border border-border rounded px-2 py-1"
                   >
                     <option value="both">Both</option>
@@ -271,7 +306,9 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
               </div>
               <Slider
                 value={filters.priceRange}
-                onValueChange={(value) => updateFilters({ priceRange: value as [number, number] })}
+                onValueChange={(value) =>
+                  updateFilters({ priceRange: value as [number, number] })
+                }
                 max={1000}
                 min={0}
                 step={10}
@@ -286,7 +323,11 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
                 {propertyTypes.map((type) => (
                   <Badge
                     key={type}
-                    variant={filters.propertyTypes.includes(type) ? "default" : "outline"}
+                    variant={
+                      filters.propertyTypes.includes(type)
+                        ? "default"
+                        : "outline"
+                    }
                     className="cursor-pointer hover:bg-primary/20 transition-colors"
                     onClick={() => togglePropertyType(type)}
                   >
@@ -324,20 +365,34 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-medium">Active filters:</span>
             {filters.propertyTypes.map((type) => (
-              <Badge key={type} variant="secondary" className="flex items-center gap-1">
+              <Badge
+                key={type}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
                 {type}
-                <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => togglePropertyType(type)} />
+                <X
+                  className="h-3 w-3 cursor-pointer hover:text-destructive"
+                  onClick={() => togglePropertyType(type)}
+                />
               </Badge>
             ))}
             {filters.amenities.map((amenity) => (
-              <Badge key={amenity} variant="secondary" className="flex items-center gap-1">
+              <Badge
+                key={amenity}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
                 {amenity}
-                <X className="h-3 w-3 cursor-pointer hover:text-destructive" onClick={() => toggleAmenity(amenity)} />
+                <X
+                  className="h-3 w-3 cursor-pointer hover:text-destructive"
+                  onClick={() => toggleAmenity(amenity)}
+                />
               </Badge>
             ))}
           </div>
         </Card>
       )}
     </div>
-  )
+  );
 }
