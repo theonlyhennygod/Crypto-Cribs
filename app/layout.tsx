@@ -28,6 +28,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Providers>
           <Suspense fallback={null}>{children}</Suspense>

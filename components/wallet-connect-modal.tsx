@@ -1,51 +1,122 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useState, useEffect } from "react"
-import { useWallet } from "@/hooks/use-wallet"
-import { Wallet, ExternalLink, AlertCircle, CheckCircle, Loader2 } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { motion } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { useWallet } from "@/hooks/use-wallet";
+import {
+  Wallet,
+  ExternalLink,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { isInstalled, getAddress, getNetwork } from "@gemwallet/api";
 
 interface WalletConnectModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalProps) {
-  const { connectMetaMask, connectGemWallet, connectionStatus, error, clearError, metamaskConnected, gemConnected } =
-    useWallet()
-  
-  const [metamaskAvailable, setMetamaskAvailable] = useState(false)
-  const [gemWalletAvailable, setGemWalletAvailable] = useState(false)
+export function WalletConnectModal({
+  open,
+  onOpenChange,
+}: WalletConnectModalProps) {
+  const {
+    connectMetaMask,
+    connectGemWallet,
+    connectionStatus,
+    error,
+    clearError,
+    metamaskConnected,
+    gemConnected,
+  } = useWallet();
+
+  const [metamaskAvailable, setMetamaskAvailable] = useState(false);
+  const [gemWalletAvailable, setGemWalletAvailable] = useState(false);
 
   // Check wallet availability
   useEffect(() => {
-    setMetamaskAvailable(typeof window !== 'undefined' && !!window.ethereum)
-    setGemWalletAvailable(typeof window !== 'undefined' && !!window.gemWallet)
-  }, [])
+    const checkWallets = async () => {
+      if (typeof window !== "undefined") {
+        setMetamaskAvailable(!!window.ethereum);
+
+        // Wait a bit for extensions to load, then check GemWallet
+        setTimeout(async () => {
+          try {
+            const gemWalletInstalled = await isInstalled();
+            console.log(
+              "💎 GemWallet API Detection Result:",
+              gemWalletInstalled
+            );
+            setGemWalletAvailable(gemWalletInstalled);
+
+            if (gemWalletInstalled) {
+              console.log("✅ GemWallet is properly installed and detected!");
+            } else {
+              console.log(
+                "❌ GemWallet not found - please install from https://gemwallet.app/"
+              );
+            }
+          } catch (error) {
+            console.log("⚠️ Error checking GemWallet:", error);
+            // Try again after a longer delay
+            setTimeout(async () => {
+              try {
+                const retryResult = await isInstalled();
+                setGemWalletAvailable(retryResult);
+                console.log("🔄 Retry GemWallet detection:", retryResult);
+              } catch (retryError) {
+                console.log(
+                  "❌ GemWallet detection failed after retry:",
+                  retryError
+                );
+                setGemWalletAvailable(false);
+              }
+            }, 2000);
+          }
+        }, 500);
+
+        // Debug: Log all available wallet providers for comparison
+        console.log("🔍 WALLET DETECTION DEBUG:");
+        console.log("  ethereum:", !!window.ethereum);
+        console.log("  window.gemWallet:", !!(window as any).gemWallet);
+        console.log("  window.xrpl:", !!(window as any).xrpl);
+        console.log("  window.gem:", !!(window as any).gem);
+      }
+    };
+
+    checkWallets();
+  }, []);
 
   const handleMetaMaskConnect = async () => {
-    clearError()
+    clearError();
     try {
-      await connectMetaMask()
+      await connectMetaMask();
     } catch (err: any) {
       // Error is handled in the hook, but we can add UI feedback here
-      console.error("MetaMask connection failed:", err)
+      console.error("MetaMask connection failed:", err);
     }
-  }
+  };
 
   const handleGemWalletConnect = async () => {
-    clearError()
+    clearError();
     try {
-      await connectGemWallet()
+      // Just call the hook - it now handles all the retry logic and proper API usage
+      await connectGemWallet();
     } catch (err: any) {
-      // Error is handled in the hook, but we can add UI feedback here
-      console.error("GemWallet connection failed:", err)
+      console.error("❌ GemWallet connection failed:", err);
+      // Error is handled in the hook
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,7 +130,8 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
 
         <div className="space-y-4">
           <p className="text-muted-foreground text-sm">
-            Connect both wallets to access the full Crypto Cribs experience with cross-chain payments.
+            Connect both wallets to access the full Crypto Cribs experience with
+            cross-chain payments.
           </p>
 
           {error && (
@@ -71,7 +143,11 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
                   <Button size="sm" variant="outline" onClick={clearError}>
                     Dismiss
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.location.reload()}
+                  >
                     Reset
                   </Button>
                 </div>
@@ -84,7 +160,11 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
               <Loader2 className="h-4 w-4 animate-spin" />
               <AlertDescription className="flex items-center justify-between">
                 <span>Connecting to wallet... This may take a moment.</span>
-                <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                >
                   Reset Connection
                 </Button>
               </AlertDescription>
@@ -92,7 +172,10 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
           )}
 
           {/* MetaMask Connection */}
-          <motion.div whileHover={{ scale: 1.02 }} className="border border-border rounded-lg p-4 space-y-3">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="border border-border rounded-lg p-4 space-y-3"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -100,22 +183,36 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
                 </div>
                 <div>
                   <h3 className="font-semibold">MetaMask</h3>
-                  <p className="text-sm text-muted-foreground">For Flare Network (EVM)</p>
+                  <p className="text-sm text-muted-foreground">
+                    For Flare Network (EVM)
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">
                   Flare
                 </Badge>
-                {metamaskConnected && <CheckCircle className="h-5 w-5 text-green-500" />}
+                {metamaskConnected && (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                )}
               </div>
             </div>
 
             <Button
               onClick={handleMetaMaskConnect}
-              disabled={connectionStatus === "connecting" || metamaskConnected || !metamaskAvailable}
+              disabled={
+                connectionStatus === "connecting" ||
+                metamaskConnected ||
+                !metamaskAvailable
+              }
               className="w-full"
-              variant={metamaskConnected ? "secondary" : metamaskAvailable ? "default" : "outline"}
+              variant={
+                metamaskConnected
+                  ? "secondary"
+                  : metamaskAvailable
+                  ? "default"
+                  : "outline"
+              }
             >
               {connectionStatus === "connecting" ? (
                 <>
@@ -148,7 +245,10 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
           </motion.div>
 
           {/* Gem Wallet Connection */}
-          <motion.div whileHover={{ scale: 1.02 }} className="border border-border rounded-lg p-4 space-y-3">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="border border-border rounded-lg p-4 space-y-3"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -156,22 +256,36 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
                 </div>
                 <div>
                   <h3 className="font-semibold">Gem Wallet</h3>
-                  <p className="text-sm text-muted-foreground">For XRPL Network</p>
+                  <p className="text-sm text-muted-foreground">
+                    For XRPL Network
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">
                   XRPL
                 </Badge>
-                {gemConnected && <CheckCircle className="h-5 w-5 text-green-500" />}
+                {gemConnected && (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                )}
               </div>
             </div>
 
             <Button
               onClick={handleGemWalletConnect}
-              disabled={connectionStatus === "connecting" || gemConnected || !gemWalletAvailable}
+              disabled={
+                connectionStatus === "connecting" ||
+                gemConnected ||
+                !gemWalletAvailable
+              }
               className="w-full"
-              variant={gemConnected ? "secondary" : gemWalletAvailable ? "default" : "outline"}
+              variant={
+                gemConnected
+                  ? "secondary"
+                  : gemWalletAvailable
+                  ? "default"
+                  : "outline"
+              }
             >
               {connectionStatus === "connecting" ? (
                 <>
@@ -205,16 +319,21 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
 
           {/* Demo Mode for Testing */}
           {!metamaskAvailable && !gemWalletAvailable && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-4">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center pt-4"
+            >
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  No wallets detected. Install MetaMask or GemWallet to connect, or continue in demo mode.
+                  No wallets detected. Install MetaMask or GemWallet to connect,
+                  or continue in demo mode.
                 </AlertDescription>
               </Alert>
-              <Button 
-                onClick={() => onOpenChange(false)} 
-                variant="outline" 
+              <Button
+                onClick={() => onOpenChange(false)}
+                variant="outline"
                 className="w-full mt-4"
               >
                 Continue in Demo Mode
@@ -223,8 +342,15 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
           )}
 
           {(metamaskConnected || gemConnected) && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-4">
-              <Button onClick={() => onOpenChange(false)} className="w-full bg-primary hover:bg-primary/90">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center pt-4"
+            >
+              <Button
+                onClick={() => onOpenChange(false)}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
                 Continue to dApp
               </Button>
             </motion.div>
@@ -232,5 +358,5 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

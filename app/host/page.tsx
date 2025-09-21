@@ -1,14 +1,26 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useHostProperties, useProperty, useBookingWrite } from "@/hooks/use-contract"
-import { useAccount } from "wagmi"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { useHydration } from "@/hooks/use-hydration";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  useHostProperties,
+  useProperty,
+  useBookingWrite,
+} from "@/hooks/use-contract";
+import { useAccount } from "wagmi";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Building2,
   Plus,
@@ -25,23 +37,277 @@ import {
   AlertCircle,
   Eye,
   Ban,
-} from "lucide-react"
-import { Navigation } from "@/components/navigation"
-import { ListPropertyModal } from "@/components/list-property-modal"
-import { FraudPreventionDashboard } from "@/components/fraud-prevention-dashboard"
-import { formatXRPAmount } from "@/lib/xrpl-client"
+} from "lucide-react";
+import { Navigation } from "@/components/navigation";
+import { ListPropertyModal } from "@/components/list-property-modal";
+import { FraudPreventionDashboard } from "@/components/fraud-prevention-dashboard";
+import { formatXRPAmount } from "@/lib/xrpl-client";
+import { toast } from "sonner";
+import { switchToCoston2, addCoston2Network } from "@/lib/network-utils";
+
+// Demo property creation component
+function DemoPropertyCreator() {
+  const { listProperty, isPending, isSuccess, error, hash, isConfirming } =
+    useBookingWrite();
+  const { chainId } = useAccount();
+  const isHydrated = useHydration();
+
+  const createDemoProperty = async () => {
+    console.log("🏠 Creating demo property for booking tests...");
+
+    // Check if we need to switch networks first
+    if (chainId !== 114) {
+      toast.error(
+        "Please manually switch to Coston2 testnet in MetaMask first, then try again.",
+        {
+          duration: 8000,
+          action: {
+            label: "Add Coston2",
+            onClick: async () => {
+              const added = await addCoston2Network();
+              if (added) {
+                toast.success(
+                  "Coston2 network added! Please switch to it manually and try again."
+                );
+              }
+            },
+          },
+        }
+      );
+      return;
+    }
+
+    console.log("🏠 Calling listProperty function...");
+    toast.info("Creating property on blockchain...");
+
+    // Direct transaction - we're on the right network
+    listProperty(
+      "Demo Beach Villa",
+      "Maldives",
+      BigInt(50000), // $500 per night in cents
+      ["WiFi", "Pool", "Beach Access", "Ocean View"],
+      BigInt(6)
+    );
+
+    console.log("🏠 listProperty function called, waiting for transaction...");
+  };
+
+  useEffect(() => {
+    if (isSuccess && hash) {
+      toast.success(
+        <div className="space-y-2">
+          <p>🎉 Demo property created successfully!</p>
+          <p className="text-sm text-muted-foreground">
+            You can now test bookings on the properties page.
+          </p>
+          <a
+            href={`https://coston2.testnet.flarescan.com/tx/${hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-1 text-blue-600 underline text-sm font-medium hover:text-blue-800"
+          >
+            <span>🔗 View Transaction on Flarescan</span>
+          </a>
+        </div>,
+        { duration: 10000 }
+      );
+      console.log("✅ Property creation successful!");
+    }
+    if (error) {
+      console.error("❌ Failed to create demo property:", error);
+      toast.error(
+        `Failed to create property: ${error.message || "Unknown error"}`
+      );
+    }
+  }, [isSuccess, error, hash]);
+
+  // Debug logging for states
+  useEffect(() => {
+    console.log("🏠 Property Creation States:", {
+      isPending,
+      isConfirming,
+      isSuccess,
+      hash: hash ? `${hash.slice(0, 10)}...${hash.slice(-8)}` : null,
+      error: error?.message,
+      chainId,
+      isHydrated,
+    });
+  }, [isPending, isConfirming, isSuccess, hash, error, chainId, isHydrated]);
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle className="text-sm">🚀 Demo Setup</CardTitle>
+        <CardDescription>
+          Create a demo property to test the booking functionality
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {/* Network Status */}
+        {isHydrated && (
+          <div className="text-xs space-y-2">
+            {chainId === 114 ? (
+              <div className="text-green-600 font-medium">
+                ✅ Connected to Coston2 testnet
+              </div>
+            ) : (
+              <div>
+                <div className="text-amber-600 font-medium">
+                  ⚠️ Currently on{" "}
+                  {chainId === 14 ? "Flare Mainnet" : `Chain ${chainId}`}. Need
+                  Coston2 (Chain ID: 114).
+                </div>
+                <details className="mt-2 text-xs text-muted-foreground">
+                  <summary className="cursor-pointer hover:text-foreground">
+                    Manual setup instructions
+                  </summary>
+                  <div className="mt-1 p-2 bg-muted rounded text-xs">
+                    <p className="font-medium">Add Coston2 manually:</p>
+                    <p>Network Name: Flare Testnet Coston2</p>
+                    <p>RPC URL: https://coston2-api.flare.network/ext/C/rpc</p>
+                    <p>Chain ID: 114</p>
+                    <p>Currency Symbol: C2FLR</p>
+                    <p>Block Explorer: https://coston2.testnet.flarescan.com</p>
+                  </div>
+                </details>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Transaction Status */}
+        {isHydrated && (isPending || isConfirming || hash) && (
+          <div className="mb-4 p-3 rounded-lg border bg-muted/50">
+            {isPending && (
+              <div className="flex items-center space-x-2 text-amber-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
+                <span className="font-medium">
+                  Waiting for wallet confirmation...
+                </span>
+              </div>
+            )}
+            {isConfirming && (
+              <div className="flex items-center space-x-2 text-blue-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent"></div>
+                <span className="font-medium">
+                  Confirming transaction on blockchain...
+                </span>
+              </div>
+            )}
+            {hash && !isPending && !isConfirming && (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-green-600">
+                  <div className="rounded-full h-4 w-4 bg-current flex items-center justify-center">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                  <span className="font-semibold">
+                    Property created successfully!
+                  </span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Transaction: {hash.slice(0, 10)}...{hash.slice(-8)}
+                </div>
+                <a
+                  href={`https://coston2.testnet.flarescan.com/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-1 text-blue-600 underline text-sm font-medium hover:text-blue-800"
+                >
+                  <span>🔗 View on Flarescan</span>
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
+        {isHydrated && (
+          <div className="flex gap-2">
+            {chainId !== 114 && (
+              <Button
+                onClick={async () => {
+                  toast.info("Adding/switching to Coston2...");
+                  const added = await addCoston2Network();
+                  if (added) {
+                    toast.success(
+                      "Coston2 network ready! Try creating property now."
+                    );
+                  } else {
+                    toast.error(
+                      "Failed to add Coston2. Please add manually in MetaMask."
+                    );
+                  }
+                }}
+                size="sm"
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Switch to Coston2
+              </Button>
+            )}
+
+            <Button
+              onClick={createDemoProperty}
+              disabled={isPending || isConfirming || chainId !== 114}
+              size="sm"
+              variant="outline"
+            >
+              {isPending
+                ? "Confirming..."
+                : isConfirming
+                ? "Processing..."
+                : "Create Demo Property"}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 // Component to display individual property card
 function PropertyCard({ propertyId }: { propertyId: bigint }) {
-  const { data: property } = useProperty(propertyId)
-  const { togglePropertyAvailability } = useBookingWrite()
+  const { data: property } = useProperty(propertyId);
+  const {
+    togglePropertyAvailability,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  } = useBookingWrite();
+
+  // Handle transaction success
+  useEffect(() => {
+    if (isSuccess && hash) {
+      toast.success(
+        <div>
+          <p>✅ Property availability updated on blockchain!</p>
+          <a
+            href={`https://coston2.testnet.flarescan.com/tx/${hash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline text-sm"
+          >
+            View on Explorer →
+          </a>
+        </div>
+      );
+    }
+  }, [isSuccess, hash]);
+
+  // Handle transaction error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Failed to update property availability");
+    }
+  }, [error]);
 
   if (!property) {
     return (
       <Card className="p-6">
         <Skeleton className="h-48 w-full" />
       </Card>
-    )
+    );
   }
 
   return (
@@ -52,12 +318,12 @@ function PropertyCard({ propertyId }: { propertyId: bigint }) {
           alt={property.name}
           className="w-full h-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = "/placeholder-property.jpg"
+            e.currentTarget.src = "/placeholder-property.jpg";
           }}
         />
-        <Badge 
+        <Badge
           className={`absolute top-2 right-2 ${
-            property.available 
+            property.available
               ? "bg-green-500/20 text-green-700 border-green-500/20"
               : "bg-red-500/20 text-red-700 border-red-500/20"
           }`}
@@ -65,7 +331,7 @@ function PropertyCard({ propertyId }: { propertyId: bigint }) {
           {property.available ? "Available" : "Unavailable"}
         </Badge>
       </div>
-      
+
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -107,9 +373,16 @@ function PropertyCard({ propertyId }: { propertyId: bigint }) {
             variant={property.available ? "outline" : "default"}
             size="sm"
             onClick={() => togglePropertyAvailability(property.id)}
+            disabled={isPending || isConfirming}
             className="flex-1"
           >
-            {property.available ? "Set Unavailable" : "Set Available"}
+            {isPending
+              ? "Confirm in Wallet..."
+              : isConfirming
+              ? "Confirming..."
+              : property.available
+              ? "Set Unavailable"
+              : "Set Available"}
           </Button>
           <Button variant="outline" size="sm">
             Edit
@@ -120,19 +393,23 @@ function PropertyCard({ propertyId }: { propertyId: bigint }) {
         </div>
       </div>
     </Card>
-  )
+  );
 }
 
 export default function HostDashboard() {
-  const { address } = useAccount()
-  const { data: hostPropertyIds, isLoading, error } = useHostProperties(address)
+  const { address } = useAccount();
+  const {
+    data: hostPropertyIds,
+    isLoading,
+    error,
+  } = useHostProperties(address);
 
   // Calculate stats from blockchain data
-  const totalProperties = hostPropertyIds?.length || 0
-  
+  const totalProperties = hostPropertyIds?.length || 0;
+
   // Note: In a full implementation, you'd calculate these from booking data
-  const monthlyRevenue = "$24,580" // Would be calculated from completed bookings
-  const occupancyRate = "87%" // Would be calculated from booking ratios
+  const monthlyRevenue = "$24,580"; // Would be calculated from completed bookings
+  const occupancyRate = "87%"; // Would be calculated from booking ratios
   if (!address) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/95">
@@ -146,14 +423,15 @@ export default function HostDashboard() {
           </Alert>
         </div>
       </div>
-    )
+    );
   }
 
   const stats = [
     {
       title: "Total Properties",
       value: totalProperties.toString(),
-      change: totalProperties > 0 ? `${totalProperties} active` : "No properties yet",
+      change:
+        totalProperties > 0 ? `${totalProperties} active` : "No properties yet",
       icon: Building2,
       color: "text-blue-400",
     },
@@ -178,7 +456,7 @@ export default function HostDashboard() {
       icon: Star,
       color: "text-yellow-400",
     },
-  ]
+  ];
 
   const properties = [
     {
@@ -214,7 +492,7 @@ export default function HostDashboard() {
       rating: 4.8,
       image: "/mountain-cabin-retreat.png",
     },
-  ]
+  ];
 
   const recentBookings = [
     {
@@ -241,7 +519,7 @@ export default function HostDashboard() {
       amount: "$1,680",
       status: "confirmed",
     },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -258,9 +536,12 @@ export default function HostDashboard() {
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-4xl font-bold text-foreground mb-2">Host Dashboard</h1>
+                <h1 className="text-4xl font-bold text-foreground mb-2">
+                  Host Dashboard
+                </h1>
                 <p className="text-muted-foreground text-lg">
-                  Manage your properties, track earnings, and grow your hosting business
+                  Manage your properties, track earnings, and grow your hosting
+                  business
                 </p>
               </div>
               <div className="flex gap-3">
@@ -278,6 +559,9 @@ export default function HostDashboard() {
             </div>
           </motion.div>
 
+          {/* Demo Setup */}
+          <DemoPropertyCreator />
+
           {/* Stats Grid */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -290,11 +574,19 @@ export default function HostDashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {stat.title}
+                      </p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {stat.value}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {stat.change}
+                      </p>
                     </div>
-                    <div className={`p-3 rounded-lg bg-secondary ${stat.color}`}>
+                    <div
+                      className={`p-3 rounded-lg bg-secondary ${stat.color}`}
+                    >
                       <stat.icon className="h-6 w-6" />
                     </div>
                   </div>
@@ -321,7 +613,9 @@ export default function HostDashboard() {
               {/* Properties Tab */}
               <TabsContent value="properties" className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold text-foreground">Your Properties</h2>
+                  <h2 className="text-2xl font-semibold text-foreground">
+                    Your Properties
+                  </h2>
                   <ListPropertyModal>
                     <Button className="gap-2">
                       <Plus className="h-4 w-4" />
@@ -352,9 +646,12 @@ export default function HostDashboard() {
                     <div className="mb-4">
                       <Building2 className="h-16 w-16 mx-auto text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">No properties listed yet</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      No properties listed yet
+                    </h3>
                     <p className="text-muted-foreground mb-4">
-                      Start earning by listing your first property on the blockchain!
+                      Start earning by listing your first property on the
+                      blockchain!
                     </p>
                     <ListPropertyModal>
                       <Button>List Your First Property</Button>
@@ -363,7 +660,10 @@ export default function HostDashboard() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {hostPropertyIds.map((propertyId) => (
-                      <PropertyCard key={propertyId.toString()} propertyId={propertyId} />
+                      <PropertyCard
+                        key={propertyId.toString()}
+                        propertyId={propertyId}
+                      />
                     ))}
                   </div>
                 )}
@@ -372,7 +672,9 @@ export default function HostDashboard() {
               {/* Bookings Tab */}
               <TabsContent value="bookings" className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold text-foreground">Recent Bookings</h2>
+                  <h2 className="text-2xl font-semibold text-foreground">
+                    Recent Bookings
+                  </h2>
                   <Button variant="outline">View All</Button>
                 </div>
 
@@ -380,22 +682,41 @@ export default function HostDashboard() {
                   <CardContent className="p-0">
                     <div className="divide-y divide-border">
                       {recentBookings.map((booking) => (
-                        <div key={booking.id} className="p-6 flex items-center justify-between">
+                        <div
+                          key={booking.id}
+                          className="p-6 flex items-center justify-between"
+                        >
                           <div className="flex items-center gap-4">
                             <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
                               <Users className="h-5 w-5 text-muted-foreground" />
                             </div>
                             <div>
-                              <p className="font-semibold text-foreground">{booking.guest}</p>
-                              <p className="text-sm text-muted-foreground">{booking.property}</p>
-                              <p className="text-xs text-muted-foreground">{booking.dates}</p>
+                              <p className="font-semibold text-foreground">
+                                {booking.guest}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {booking.property}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {booking.dates}
+                              </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-foreground">{booking.amount}</p>
+                            <p className="font-semibold text-foreground">
+                              {booking.amount}
+                            </p>
                             <Badge
-                              variant={booking.status === "confirmed" ? "default" : "secondary"}
-                              className={booking.status === "confirmed" ? "bg-green-600" : "bg-yellow-600"}
+                              variant={
+                                booking.status === "confirmed"
+                                  ? "default"
+                                  : "secondary"
+                              }
+                              className={
+                                booking.status === "confirmed"
+                                  ? "bg-green-600"
+                                  : "bg-yellow-600"
+                              }
                             >
                               {booking.status}
                             </Badge>
@@ -409,13 +730,19 @@ export default function HostDashboard() {
 
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6">
-                <h2 className="text-2xl font-semibold text-foreground">Performance Analytics</h2>
+                <h2 className="text-2xl font-semibold text-foreground">
+                  Performance Analytics
+                </h2>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card className="bg-card border-border">
                     <CardHeader>
-                      <CardTitle className="text-foreground">Revenue Trends</CardTitle>
-                      <CardDescription>Monthly revenue over the past 6 months</CardDescription>
+                      <CardTitle className="text-foreground">
+                        Revenue Trends
+                      </CardTitle>
+                      <CardDescription>
+                        Monthly revenue over the past 6 months
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="h-64 flex items-center justify-center text-muted-foreground">
@@ -426,8 +753,12 @@ export default function HostDashboard() {
 
                   <Card className="bg-card border-border">
                     <CardHeader>
-                      <CardTitle className="text-foreground">Booking Patterns</CardTitle>
-                      <CardDescription>Occupancy rates by property type</CardDescription>
+                      <CardTitle className="text-foreground">
+                        Booking Patterns
+                      </CardTitle>
+                      <CardDescription>
+                        Occupancy rates by property type
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="h-64 flex items-center justify-center text-muted-foreground">
@@ -440,7 +771,9 @@ export default function HostDashboard() {
 
               {/* Blockchain Tab */}
               <TabsContent value="blockchain" className="space-y-6">
-                <h2 className="text-2xl font-semibold text-foreground">Blockchain Integration</h2>
+                <h2 className="text-2xl font-semibold text-foreground">
+                  Blockchain Integration
+                </h2>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <Card className="bg-card border-border">
@@ -449,13 +782,19 @@ export default function HostDashboard() {
                         <Shield className="h-5 w-5" />
                         Property Verification
                       </CardTitle>
-                      <CardDescription>Mint your properties as NFTs for blockchain verification</CardDescription>
+                      <CardDescription>
+                        Mint your properties as NFTs for blockchain verification
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
                         <div>
-                          <p className="font-semibold text-foreground">Verified Properties</p>
-                          <p className="text-sm text-muted-foreground">8 of 12 properties verified</p>
+                          <p className="font-semibold text-foreground">
+                            Verified Properties
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            8 of 12 properties verified
+                          </p>
                         </div>
                         <Badge className="bg-green-600">67% Complete</Badge>
                       </div>
@@ -472,24 +811,41 @@ export default function HostDashboard() {
                         <Lock className="h-5 w-5" />
                         Escrow Management
                       </CardTitle>
-                      <CardDescription>Manage listing fees and security deposits</CardDescription>
+                      <CardDescription>
+                        Manage listing fees and security deposits
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Total Escrowed</span>
-                          <span className="font-semibold text-foreground">$12,450</span>
+                          <span className="text-sm text-muted-foreground">
+                            Total Escrowed
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            $12,450
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Pending Release</span>
-                          <span className="font-semibold text-foreground">$3,200</span>
+                          <span className="text-sm text-muted-foreground">
+                            Pending Release
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            $3,200
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Available Balance</span>
-                          <span className="font-semibold text-green-400">$9,250</span>
+                          <span className="text-sm text-muted-foreground">
+                            Available Balance
+                          </span>
+                          <span className="font-semibold text-green-400">
+                            $9,250
+                          </span>
                         </div>
                       </div>
-                      <Button variant="outline" className="w-full gap-2 bg-transparent">
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2 bg-transparent"
+                      >
                         <Wallet className="h-4 w-4" />
                         Manage Escrow
                       </Button>
@@ -499,30 +855,46 @@ export default function HostDashboard() {
 
                 <Card className="bg-card border-border">
                   <CardHeader>
-                    <CardTitle className="text-foreground">Smart Contract Status</CardTitle>
-                    <CardDescription>Overview of your blockchain integrations</CardDescription>
+                    <CardTitle className="text-foreground">
+                      Smart Contract Status
+                    </CardTitle>
+                    <CardDescription>
+                      Overview of your blockchain integrations
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg">
                         <CheckCircle className="h-8 w-8 text-green-400" />
                         <div>
-                          <p className="font-semibold text-foreground">Property NFTs</p>
-                          <p className="text-sm text-muted-foreground">8 minted</p>
+                          <p className="font-semibold text-foreground">
+                            Property NFTs
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            8 minted
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg">
                         <Clock className="h-8 w-8 text-yellow-400" />
                         <div>
-                          <p className="font-semibold text-foreground">Escrow Contracts</p>
-                          <p className="text-sm text-muted-foreground">3 active</p>
+                          <p className="font-semibold text-foreground">
+                            Escrow Contracts
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            3 active
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg">
                         <AlertCircle className="h-8 w-8 text-blue-400" />
                         <div>
-                          <p className="font-semibold text-foreground">Pending Actions</p>
-                          <p className="text-sm text-muted-foreground">2 required</p>
+                          <p className="font-semibold text-foreground">
+                            Pending Actions
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            2 required
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -539,5 +911,5 @@ export default function HostDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

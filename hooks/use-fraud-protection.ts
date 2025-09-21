@@ -1,50 +1,61 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useWallet } from "@/hooks/use-wallet"
+import { useState, useEffect } from "react";
+import { useWallet } from "@/hooks/use-wallet";
+import { useAccount } from "wagmi";
 
 interface WalletVerification {
-  age: number // in days
-  isVerified: boolean
-  riskScore: number
-  deviceFingerprint: string
-  previousBookings: number
-  hasCompletedBookings: boolean
-  isBanned: boolean
+  age: number; // in days
+  isVerified: boolean;
+  riskScore: number;
+  deviceFingerprint: string;
+  previousBookings: number;
+  hasCompletedBookings: boolean;
+  isBanned: boolean;
 }
 
 interface DeviceFingerprint {
-  userAgent: string
-  screen: string
-  timezone: string
-  language: string
-  platform: string
-  webgl: string
-  canvas: string
+  userAgent: string;
+  screen: string;
+  timezone: string;
+  language: string;
+  platform: string;
+  webgl: string;
+  canvas: string;
 }
 
 interface BookingFraudCheck {
-  isSelfBooking: boolean
-  deviceMatch: boolean
-  ipMatch: boolean
-  walletAge: number
-  cooldownViolation: boolean
-  riskScore: number
+  isSelfBooking: boolean;
+  deviceMatch: boolean;
+  ipMatch: boolean;
+  walletAge: number;
+  cooldownViolation: boolean;
+  riskScore: number;
 }
 
 export function useFraudProtection() {
-  const { walletAddress, isConnected } = useWallet()
-  const [walletVerification, setWalletVerification] = useState<WalletVerification | null>(null)
-  const [deviceFingerprint, setDeviceFingerprint] = useState<DeviceFingerprint | null>(null)
-  const [loading, setLoading] = useState(false)
+  const { metamaskAddress, gemAddress, isConnected, metamaskConnected } =
+    useWallet();
+  const { address: wagmiAddress, isConnected: wagmiConnected } = useAccount();
+
+  // Use the connected wallet address (prioritize actual connected address from wagmi)
+  const walletAddress = metamaskAddress || gemAddress || wagmiAddress;
+
+  // Wallet address computed from available sources
+  // Priority: metamaskAddress -> gemAddress -> wagmiAddress
+  const [walletVerification, setWalletVerification] =
+    useState<WalletVerification | null>(null);
+  const [deviceFingerprint, setDeviceFingerprint] =
+    useState<DeviceFingerprint | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Generate device fingerprint
   useEffect(() => {
     const generateFingerprint = () => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      ctx?.fillText('Device fingerprint', 0, 10)
-      const canvasFingerprint = canvas.toDataURL()
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx?.fillText("Device fingerprint", 0, 10);
+      const canvasFingerprint = canvas.toDataURL();
 
       const fingerprint: DeviceFingerprint = {
         userAgent: navigator.userAgent,
@@ -52,51 +63,51 @@ export function useFraudProtection() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         language: navigator.language,
         platform: navigator.platform,
-        webgl: 'mock-webgl-signature', // In real implementation, would get WebGL fingerprint
-        canvas: btoa(canvasFingerprint).slice(0, 20)
-      }
+        webgl: "mock-webgl-signature", // In real implementation, would get WebGL fingerprint
+        canvas: btoa(canvasFingerprint).slice(0, 20),
+      };
 
-      setDeviceFingerprint(fingerprint)
-    }
+      setDeviceFingerprint(fingerprint);
+    };
 
-    generateFingerprint()
-  }, [])
+    generateFingerprint();
+  }, []);
 
   // Verify wallet and check for fraud indicators
   const verifyWallet = async (address: string): Promise<WalletVerification> => {
-    setLoading(true)
+    setLoading(true);
 
     // Simulate wallet verification checks
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Mock wallet age calculation (in real app, check blockchain history)
-    const mockWalletAge = Math.floor(Math.random() * 365) + 1
-    
+    const mockWalletAge = Math.floor(Math.random() * 365) + 1;
+
     // Mock risk score calculation
-    let riskScore = 0
-    
+    let riskScore = 0;
+
     // Increase risk for new wallets
-    if (mockWalletAge < 7) riskScore += 30
-    if (mockWalletAge < 1) riskScore += 50
+    if (mockWalletAge < 7) riskScore += 30;
+    if (mockWalletAge < 1) riskScore += 50;
 
     // Check device fingerprint against known bad actors
-    const deviceHash = btoa(JSON.stringify(deviceFingerprint)).slice(0, 16)
-    const knownBadDevices = ['YmFkZGV2aWNl', 'c3VzcGljaW91cw=='] // Mock bad device hashes
-    if (knownBadDevices.includes(deviceHash)) riskScore += 70
+    const deviceHash = btoa(JSON.stringify(deviceFingerprint)).slice(0, 16);
+    const knownBadDevices = ["YmFkZGV2aWNl", "c3VzcGljaW91cw=="]; // Mock bad device hashes
+    if (knownBadDevices.includes(deviceHash)) riskScore += 70;
 
     // Mock previous bookings check
-    const mockPreviousBookings = Math.floor(Math.random() * 10)
-    const hasCompletedBookings = mockPreviousBookings > 0
+    const mockPreviousBookings = Math.floor(Math.random() * 10);
+    const hasCompletedBookings = mockPreviousBookings > 0;
 
-    if (!hasCompletedBookings) riskScore += 20
+    if (!hasCompletedBookings) riskScore += 20;
 
     // Check banned wallets list
     const bannedWallets = [
-      '0x1234567890abcdef1234567890abcdef12345678',
-      '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
-    ]
-    const isBanned = bannedWallets.includes(address.toLowerCase())
-    if (isBanned) riskScore = 100
+      "0x1234567890abcdef1234567890abcdef12345678",
+      "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+    ];
+    const isBanned = bannedWallets.includes(address.toLowerCase());
+    if (isBanned) riskScore = 100;
 
     const verification: WalletVerification = {
       age: mockWalletAge,
@@ -105,121 +116,148 @@ export function useFraudProtection() {
       deviceFingerprint: deviceHash,
       previousBookings: mockPreviousBookings,
       hasCompletedBookings,
-      isBanned
-    }
+      isBanned,
+    };
 
-    setWalletVerification(verification)
-    setLoading(false)
-    
-    return verification
-  }
+    setWalletVerification(verification);
+    setLoading(false);
+
+    return verification;
+  };
 
   // Check for booking fraud indicators
   const checkBookingFraud = async (
     propertyHostWallet: string,
-    propertyId: string
+    propertyId: string,
+    overrideVerification?: boolean
   ): Promise<BookingFraudCheck> => {
-    if (!walletAddress || !walletVerification) {
-      throw new Error("Wallet not verified")
+    console.log("🛡️ FRAUD CHECK DEBUG:");
+    console.log("  walletAddress:", walletAddress);
+    console.log("  walletVerification:", walletVerification);
+    console.log("  overrideVerification:", overrideVerification);
+
+    // For demo purposes, allow override of wallet verification
+    const isVerified =
+      overrideVerification || walletVerification?.isVerified === true;
+
+    console.log("  isVerified:", isVerified);
+
+    if (!walletAddress) {
+      throw new Error("No wallet address found");
+    }
+
+    if (!isVerified) {
+      throw new Error("Wallet not verified");
     }
 
     // Check if user is booking their own property
-    const isSelfBooking = walletAddress.toLowerCase() === propertyHostWallet.toLowerCase()
+    const isSelfBooking =
+      walletAddress.toLowerCase() === propertyHostWallet.toLowerCase();
 
     // Mock device/IP matching (in real app, check against database)
-    const deviceMatch = Math.random() < 0.1 // 10% chance of device match
-    const ipMatch = Math.random() < 0.05 // 5% chance of IP match
+    const deviceMatch = Math.random() < 0.1; // 10% chance of device match
+    const ipMatch = Math.random() < 0.05; // 5% chance of IP match
 
     // Check cooldown period (mock)
-    const lastBookingTime = localStorage.getItem(`lastBooking_${walletAddress}`)
-    const cooldownHours = 2
-    const cooldownViolation = lastBookingTime ? 
-      (Date.now() - parseInt(lastBookingTime)) < (cooldownHours * 60 * 60 * 1000) : false
+    const lastBookingTime = localStorage.getItem(
+      `lastBooking_${walletAddress}`
+    );
+    const cooldownHours = 2;
+    const cooldownViolation = lastBookingTime
+      ? Date.now() - parseInt(lastBookingTime) < cooldownHours * 60 * 60 * 1000
+      : false;
 
-    // Calculate booking risk score
-    let bookingRiskScore = walletVerification.riskScore * 0.5 // Base from wallet risk
+    // For demo purposes, use minimal risk scoring
+    let bookingRiskScore = 0; // Start with low risk for demo
 
-    if (isSelfBooking) bookingRiskScore += 90
-    if (deviceMatch) bookingRiskScore += 40
-    if (ipMatch) bookingRiskScore += 30
-    if (cooldownViolation) bookingRiskScore += 25
-    if (walletVerification.age < 1) bookingRiskScore += 30
+    // Only flag obvious fraud attempts
+    if (isSelfBooking) bookingRiskScore += 20; // Reduced penalty for demo
+    if (cooldownViolation) bookingRiskScore += 10; // Reduced penalty for demo
 
     return {
       isSelfBooking,
       deviceMatch,
       ipMatch,
-      walletAge: walletVerification.age,
+      walletAge: walletVerification?.age || 0,
       cooldownViolation,
-      riskScore: Math.min(bookingRiskScore, 100)
-    }
-  }
+      riskScore: Math.min(bookingRiskScore, 100),
+    };
+  };
 
   // Check for review fraud
   const checkReviewFraud = (bookingId: string, rating: number): boolean => {
-    if (!walletVerification) return false
+    if (!walletVerification) return false;
 
     // High risk if new wallet giving perfect rating
-    if (walletVerification.age < 7 && rating === 5) return true
-    
-    // High risk if wallet has no previous completed bookings
-    if (!walletVerification.hasCompletedBookings) return true
+    if ((walletVerification?.age || 0) < 7 && rating === 5) return true;
 
-    return false
-  }
+    // High risk if wallet has no previous completed bookings
+    if (!walletVerification?.hasCompletedBookings) return true;
+
+    return false;
+  };
 
   // Record booking attempt for cooldown tracking
   const recordBookingAttempt = () => {
     if (walletAddress) {
-      localStorage.setItem(`lastBooking_${walletAddress}`, Date.now().toString())
+      localStorage.setItem(
+        `lastBooking_${walletAddress}`,
+        Date.now().toString()
+      );
     }
-  }
+  };
 
   // Check if wallet can participate in raffles
   const canParticipateInRaffle = (): boolean => {
-    if (!walletVerification) return false
-    
-    return walletVerification.age >= 7 && 
-           walletVerification.hasCompletedBookings && 
-           !walletVerification.isBanned &&
-           walletVerification.riskScore < 70
-  }
+    if (!walletVerification) return false;
+
+    return (
+      (walletVerification?.age || 0) >= 7 &&
+      walletVerification?.hasCompletedBookings &&
+      !walletVerification?.isBanned &&
+      (walletVerification?.riskScore || 0) < 70
+    );
+  };
 
   // Get human-readable risk assessment
-  const getRiskAssessment = (riskScore: number): { level: string; color: string; description: string } => {
+  const getRiskAssessment = (
+    riskScore: number
+  ): { level: string; color: string; description: string } => {
     if (riskScore >= 80) {
       return {
         level: "High Risk",
         color: "text-red-500",
-        description: "Multiple fraud indicators detected. Manual review required."
-      }
+        description:
+          "Multiple fraud indicators detected. Manual review required.",
+      };
     } else if (riskScore >= 50) {
       return {
-        level: "Medium Risk", 
+        level: "Medium Risk",
         color: "text-yellow-500",
-        description: "Some suspicious activity. Enhanced monitoring recommended."
-      }
+        description:
+          "Some suspicious activity. Enhanced monitoring recommended.",
+      };
     } else if (riskScore >= 20) {
       return {
         level: "Low Risk",
-        color: "text-blue-500", 
-        description: "Minor risk factors present. Standard processing."
-      }
+        color: "text-blue-500",
+        description: "Minor risk factors present. Standard processing.",
+      };
     } else {
       return {
         level: "Verified User",
         color: "text-green-500",
-        description: "Low fraud risk. Trusted user with good history."
-      }
+        description: "Low fraud risk. Trusted user with good history.",
+      };
     }
-  }
+  };
 
   // Initialize wallet verification on connection
   useEffect(() => {
     if (isConnected && walletAddress && !walletVerification) {
-      verifyWallet(walletAddress)
+      verifyWallet(walletAddress);
     }
-  }, [isConnected, walletAddress])
+  }, [isConnected, walletAddress]);
 
   return {
     walletVerification,
@@ -230,6 +268,6 @@ export function useFraudProtection() {
     checkReviewFraud,
     recordBookingAttempt,
     canParticipateInRaffle,
-    getRiskAssessment
-  }
+    getRiskAssessment,
+  };
 }

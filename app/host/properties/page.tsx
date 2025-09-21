@@ -270,7 +270,7 @@ export default function PropertyManagement() {
               <Card key={property.id} className="bg-card border-border overflow-hidden">
                 <div className="aspect-video relative">
                   <img
-                    src={property.images[0] || "/placeholder.svg"}
+                    src={property.images[0] || "/loft-interior-modern.jpg"}
                     alt={property.title}
                     className="w-full h-full object-cover"
                   />

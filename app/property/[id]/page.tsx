@@ -1,7 +1,7 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+"use client";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Star,
   MapPin,
@@ -16,11 +16,11 @@ import {
   Share,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react"
-import { useState } from "react"
-import { BookingCard } from "@/components/booking-card"
-import { StakingCard } from "@/components/staking-card"
-import { useRouter } from "next/navigation"
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { BookingCard } from "@/components/booking-card";
+import { StakingCard } from "@/components/staking-card";
+import { useRouter } from "next/navigation";
 
 // Mock property data - in real app this would come from API
 const mockProperties = [
@@ -37,14 +37,33 @@ const mockProperties = [
     bedrooms: 4,
     bathrooms: 3,
     propertyType: "Villa",
-    images: ["/luxury-beachfront-villa-maldives.jpg", "/villa-pool-maldives.jpg", "/villa-bedroom-luxury.jpg"],
-    amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Gym", "Beach Access", "Air Conditioning", "Hot Tub"],
+    images: [
+      "/luxury-beachfront-villa-maldives.jpg",
+      "/villa-pool-maldives.jpg",
+      "/villa-bedroom-luxury.jpg",
+    ],
+    amenities: [
+      "WiFi",
+      "Pool",
+      "Kitchen",
+      "Parking",
+      "Gym",
+      "Beach Access",
+      "Air Conditioning",
+      "Hot Tub",
+    ],
     host: "Sarah Chen",
     hostWallet: "0x1234567890abcdef1234567890abcdef12345678",
     isVerified: true,
     discount: 30,
-    description: "Experience paradise in this stunning beachfront villa featuring panoramic ocean views, private infinity pool, and direct beach access. Perfect for families or groups seeking luxury and tranquility.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Experience paradise in this stunning beachfront villa featuring panoramic ocean views, private infinity pool, and direct beach access. Perfect for families or groups seeking luxury and tranquility.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -60,14 +79,24 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 2,
     propertyType: "Loft",
-    images: ["/modern-loft-tokyo-city-view.jpg", "/loft-interior-modern.jpg", "/tokyo-skyline-view.jpg"],
+    images: [
+      "/modern-loft-tokyo-city-view.jpg",
+      "/loft-interior-modern.jpg",
+      "/tokyo-skyline-view.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning"],
     host: "Kenji Tanaka",
     hostWallet: "0x2345678901bcdef1234567890abcdef1234567890",
     isVerified: true,
     discount: 35,
-    description: "Modern loft in the heart of Tokyo with stunning city views. Perfect for urban explorers and business travelers.",
-    houseRules: ["No smoking", "No pets", "Check-in after 2 PM", "Check-out before 10 AM"],
+    description:
+      "Modern loft in the heart of Tokyo with stunning city views. Perfect for urban explorers and business travelers.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 2 PM",
+      "Check-out before 10 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 24 hours before check-in",
   },
   {
@@ -83,14 +112,24 @@ const mockProperties = [
     bedrooms: 3,
     bathrooms: 2,
     propertyType: "House",
-    images: ["/mountain-cabin-swiss-alps.jpg", "/cabin-hot-tub-mountains.jpg", "/cozy-cabin-interior.png"],
+    images: [
+      "/mountain-cabin-swiss-alps.jpg",
+      "/cabin-hot-tub-mountains.jpg",
+      "/cozy-cabin-interior.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Heating", "Hot Tub"],
     host: "Hans Mueller",
     hostWallet: "0x3456789012cdef1234567890abcdef1234567890",
     isVerified: true,
     discount: 33,
-    description: "Escape to the mountains in this charming cabin with private hot tub and breathtaking alpine views.",
-    houseRules: ["No smoking", "Pets allowed", "Check-in after 4 PM", "Check-out before 11 AM"],
+    description:
+      "Escape to the mountains in this charming cabin with private hot tub and breathtaking alpine views.",
+    houseRules: [
+      "No smoking",
+      "Pets allowed",
+      "Check-in after 4 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 72 hours before check-in",
   },
   {
@@ -106,14 +145,24 @@ const mockProperties = [
     bedrooms: 1,
     bathrooms: 1,
     propertyType: "Studio",
-    images: ["/stylish-studio-barcelona-historic.jpg", "/barcelona-apartment-interior.jpg", "/historic-district-barcelona.jpg"],
+    images: [
+      "/stylish-studio-barcelona-historic.jpg",
+      "/barcelona-apartment-interior.jpg",
+      "/historic-district-barcelona.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Air conditioning"],
     host: "Maria Rodriguez",
     hostWallet: "0x4567890123def1234567890abcdef1234567890",
     isVerified: false,
     discount: 32,
-    description: "Charming studio in Barcelona's historic district, perfect for couples exploring the city.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Charming studio in Barcelona's historic district, perfect for couples exploring the city.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -129,14 +178,31 @@ const mockProperties = [
     bedrooms: 5,
     bathrooms: 4,
     propertyType: "Condo",
-    images: ["/oceanfront-penthouse-miami-beach.jpg", "/infinity-pool-ocean-view.png", "/luxury-penthouse-interior.png"],
-    amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Gym", "Air conditioning"],
+    images: [
+      "/oceanfront-penthouse-miami-beach.jpg",
+      "/infinity-pool-ocean-view.png",
+      "/luxury-penthouse-interior.png",
+    ],
+    amenities: [
+      "WiFi",
+      "Pool",
+      "Kitchen",
+      "Parking",
+      "Gym",
+      "Air conditioning",
+    ],
     host: "David Johnson",
     hostWallet: "0x5678901234ef1234567890abcdef1234567890",
     isVerified: true,
     discount: 28,
-    description: "Luxury penthouse with infinity pool overlooking the ocean. Perfect for large groups and special occasions.",
-    houseRules: ["No smoking", "No pets", "Check-in after 4 PM", "Check-out before 11 AM"],
+    description:
+      "Luxury penthouse with infinity pool overlooking the ocean. Perfect for large groups and special occasions.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 4 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -152,14 +218,24 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 1,
     propertyType: "House",
-    images: ["/traditional-ryokan-kyoto-garden.jpg", "/japanese-garden-ryokan.jpg", "/traditional-japanese-room.jpg"],
+    images: [
+      "/traditional-ryokan-kyoto-garden.jpg",
+      "/japanese-garden-ryokan.jpg",
+      "/traditional-japanese-room.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Garden", "Traditional Bath"],
     host: "Yuki Sato",
     hostWallet: "0x6789012345f1234567890abcdef1234567890",
     isVerified: true,
     discount: 31,
-    description: "Authentic Japanese ryokan experience with traditional garden views and cultural immersion.",
-    houseRules: ["No smoking", "No pets", "Check-in after 2 PM", "Check-out before 10 AM"],
+    description:
+      "Authentic Japanese ryokan experience with traditional garden views and cultural immersion.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 2 PM",
+      "Check-out before 10 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 24 hours before check-in",
   },
   // US Cities Properties
@@ -176,14 +252,24 @@ const mockProperties = [
     bedrooms: 3,
     bathrooms: 2,
     propertyType: "Condo",
-    images: ["/luxury-penthouse-interior.png", "/modern-penthouse.png", "/tokyo-skyline-view.jpg"],
+    images: [
+      "/luxury-penthouse-interior.png",
+      "/modern-penthouse.png",
+      "/tokyo-skyline-view.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning", "City View"],
     host: "Michael Chen",
     hostWallet: "0x78901234561234567890abcdef1234567890",
     isVerified: true,
     discount: 30,
-    description: "Stunning Manhattan penthouse with panoramic city views. Perfect for business travelers and city explorers.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Stunning Manhattan penthouse with panoramic city views. Perfect for business travelers and city explorers.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -199,14 +285,24 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 2,
     propertyType: "Loft",
-    images: ["/loft-interior-modern.jpg", "/modern-loft-tokyo-city-view.jpg", "/tokyo-cityscape-neon-lights.jpg"],
+    images: [
+      "/loft-interior-modern.jpg",
+      "/modern-loft-tokyo-city-view.jpg",
+      "/tokyo-cityscape-neon-lights.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Parking", "Air conditioning", "Workspace"],
     host: "Sarah Williams",
     hostWallet: "0x8901234567234567890abcdef1234567890",
     isVerified: true,
     discount: 27,
-    description: "Modern loft in downtown LA with industrial design and city views. Perfect for creative professionals.",
-    houseRules: ["No smoking", "No pets", "Check-in after 2 PM", "Check-out before 10 AM"],
+    description:
+      "Modern loft in downtown LA with industrial design and city views. Perfect for creative professionals.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 2 PM",
+      "Check-out before 10 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 24 hours before check-in",
   },
   {
@@ -222,14 +318,24 @@ const mockProperties = [
     bedrooms: 3,
     bathrooms: 2,
     propertyType: "House",
-    images: ["/barcelona-apartment-interior.jpg", "/historic-district-barcelona.jpg", "/mountain-cabin-retreat.png"],
+    images: [
+      "/barcelona-apartment-interior.jpg",
+      "/historic-district-barcelona.jpg",
+      "/mountain-cabin-retreat.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Parking", "Heating", "Garden"],
     host: "David Rodriguez",
     hostWallet: "0x901234567834567890abcdef1234567890",
     isVerified: true,
     discount: 28,
-    description: "Charming Victorian house in San Francisco with period details and modern amenities. Perfect for families.",
-    houseRules: ["No smoking", "Pets allowed", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Charming Victorian house in San Francisco with period details and modern amenities. Perfect for families.",
+    houseRules: [
+      "No smoking",
+      "Pets allowed",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -245,14 +351,24 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 2,
     propertyType: "Apartment",
-    images: ["/modern-loft-tokyo-city-view.jpg", "/luxury-penthouse-interior.png", "/tokyo-cityscape-neon-lights.jpg"],
+    images: [
+      "/modern-loft-tokyo-city-view.jpg",
+      "/luxury-penthouse-interior.png",
+      "/tokyo-cityscape-neon-lights.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning", "City View"],
     host: "Jennifer Martinez",
     hostWallet: "0x01234567894567890abcdef1234567890",
     isVerified: true,
     discount: 31,
-    description: "Luxury apartment in Chicago's Loop district with modern amenities and city views.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Luxury apartment in Chicago's Loop district with modern amenities and city views.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -268,14 +384,24 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 2,
     propertyType: "House",
-    images: ["/historic-district-barcelona.jpg", "/mountain-cabin-retreat.png", "/cozy-cabin-interior.png"],
+    images: [
+      "/historic-district-barcelona.jpg",
+      "/mountain-cabin-retreat.png",
+      "/cozy-cabin-interior.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Heating", "Garden", "Parking"],
     host: "Robert Thompson",
     hostWallet: "0x1234567890567890abcdef1234567890",
     isVerified: true,
     discount: 27,
-    description: "Historic brownstone in Boston with traditional charm and modern conveniences.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Historic brownstone in Boston with traditional charm and modern conveniences.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -291,14 +417,24 @@ const mockProperties = [
     bedrooms: 1,
     bathrooms: 1,
     propertyType: "Studio",
-    images: ["/stylish-studio-barcelona-historic.jpg", "/modern-penthouse.png", "/tokyo-skyline-view.jpg"],
+    images: [
+      "/stylish-studio-barcelona-historic.jpg",
+      "/modern-penthouse.png",
+      "/tokyo-skyline-view.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Air conditioning", "Workspace"],
     host: "Lisa Anderson",
     hostWallet: "0x234567890167890abcdef1234567890",
     isVerified: true,
     discount: 31,
-    description: "Modern studio in Seattle's downtown with tech-friendly amenities and city views.",
-    houseRules: ["No smoking", "No pets", "Check-in after 2 PM", "Check-out before 10 AM"],
+    description:
+      "Modern studio in Seattle's downtown with tech-friendly amenities and city views.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 2 PM",
+      "Check-out before 10 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 24 hours before check-in",
   },
   {
@@ -314,14 +450,24 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 2,
     propertyType: "Condo",
-    images: ["/modern-penthouse.png", "/infinity-pool-ocean-view.png", "/tokyo-skyline-view.jpg"],
+    images: [
+      "/modern-penthouse.png",
+      "/infinity-pool-ocean-view.png",
+      "/tokyo-skyline-view.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Pool", "Gym", "Air conditioning"],
     host: "James Wilson",
     hostWallet: "0x34567890127890abcdef1234567890",
     isVerified: true,
     discount: 29,
-    description: "Luxury condo in Austin's downtown with pool access and modern amenities.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Luxury condo in Austin's downtown with pool access and modern amenities.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -337,14 +483,24 @@ const mockProperties = [
     bedrooms: 3,
     bathrooms: 2,
     propertyType: "House",
-    images: ["/mountain-cabin-swiss-alps.jpg", "/cabin-hot-tub-mountains.jpg", "/cozy-cabin-interior.png"],
+    images: [
+      "/mountain-cabin-swiss-alps.jpg",
+      "/cabin-hot-tub-mountains.jpg",
+      "/cozy-cabin-interior.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Heating", "Hot Tub", "Mountain View"],
     host: "Amanda Davis",
     hostWallet: "0x4567890123890abcdef1234567890",
     isVerified: true,
     discount: 26,
-    description: "Cozy mountain cabin near Denver with hot tub and stunning mountain views.",
-    houseRules: ["No smoking", "Pets allowed", "Check-in after 4 PM", "Check-out before 11 AM"],
+    description:
+      "Cozy mountain cabin near Denver with hot tub and stunning mountain views.",
+    houseRules: [
+      "No smoking",
+      "Pets allowed",
+      "Check-in after 4 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 72 hours before check-in",
   },
   {
@@ -360,14 +516,31 @@ const mockProperties = [
     bedrooms: 4,
     bathrooms: 3,
     propertyType: "Villa",
-    images: ["/luxury-beachfront-villa-maldives.jpg", "/villa-pool-maldives.jpg", "/villa-bedroom-luxury.jpg"],
-    amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Beach Access", "Air conditioning"],
+    images: [
+      "/luxury-beachfront-villa-maldives.jpg",
+      "/villa-pool-maldives.jpg",
+      "/villa-bedroom-luxury.jpg",
+    ],
+    amenities: [
+      "WiFi",
+      "Pool",
+      "Kitchen",
+      "Parking",
+      "Beach Access",
+      "Air conditioning",
+    ],
     host: "Carlos Mendez",
     hostWallet: "0x567890123490abcdef1234567890",
     isVerified: true,
     discount: 29,
-    description: "Luxury beachfront villa in San Diego with private pool and direct beach access.",
-    houseRules: ["No smoking", "No pets", "Check-in after 4 PM", "Check-out before 11 AM"],
+    description:
+      "Luxury beachfront villa in San Diego with private pool and direct beach access.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 4 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -383,14 +556,24 @@ const mockProperties = [
     bedrooms: 1,
     bathrooms: 1,
     propertyType: "Apartment",
-    images: ["/barcelona-apartment-interior.jpg", "/mountain-cabin-retreat.png", "/cozy-cabin-interior.png"],
+    images: [
+      "/barcelona-apartment-interior.jpg",
+      "/mountain-cabin-retreat.png",
+      "/cozy-cabin-interior.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Air conditioning", "Workspace"],
     host: "Rachel Green",
     hostWallet: "0x67890123450abcdef1234567890",
     isVerified: true,
     discount: 31,
-    description: "Modern apartment in Portland's Pearl District with urban amenities and city views.",
-    houseRules: ["No smoking", "No pets", "Check-in after 2 PM", "Check-out before 10 AM"],
+    description:
+      "Modern apartment in Portland's Pearl District with urban amenities and city views.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 2 PM",
+      "Check-out before 10 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 24 hours before check-in",
   },
   {
@@ -406,14 +589,31 @@ const mockProperties = [
     bedrooms: 3,
     bathrooms: 3,
     propertyType: "Condo",
-    images: ["/oceanfront-penthouse-miami-beach.jpg", "/infinity-pool-ocean-view.png", "/modern-penthouse.png"],
-    amenities: ["WiFi", "Pool", "Kitchen", "Gym", "Air conditioning", "City View"],
+    images: [
+      "/oceanfront-penthouse-miami-beach.jpg",
+      "/infinity-pool-ocean-view.png",
+      "/modern-penthouse.png",
+    ],
+    amenities: [
+      "WiFi",
+      "Pool",
+      "Kitchen",
+      "Gym",
+      "Air conditioning",
+      "City View",
+    ],
     host: "Anthony Vegas",
     hostWallet: "0x7890123456bcdef1234567890",
     isVerified: true,
     discount: 31,
-    description: "Luxury penthouse on the Las Vegas Strip with pool access and city views.",
-    houseRules: ["No smoking", "No pets", "Check-in after 4 PM", "Check-out before 11 AM"],
+    description:
+      "Luxury penthouse on the Las Vegas Strip with pool access and city views.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 4 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
   {
@@ -429,38 +629,59 @@ const mockProperties = [
     bedrooms: 2,
     bathrooms: 2,
     propertyType: "House",
-    images: ["/historic-district-barcelona.jpg", "/mountain-cabin-retreat.png", "/cozy-cabin-interior.png"],
+    images: [
+      "/historic-district-barcelona.jpg",
+      "/mountain-cabin-retreat.png",
+      "/cozy-cabin-interior.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Heating", "Parking", "Garden"],
     host: "Patricia Brown",
     hostWallet: "0x8901234567cdef1234567890",
     isVerified: true,
     discount: 32,
-    description: "Historic townhouse in Philadelphia with traditional charm and modern amenities.",
-    houseRules: ["No smoking", "No pets", "Check-in after 3 PM", "Check-out before 11 AM"],
+    description:
+      "Historic townhouse in Philadelphia with traditional charm and modern amenities.",
+    houseRules: [
+      "No smoking",
+      "No pets",
+      "Check-in after 3 PM",
+      "Check-out before 11 AM",
+    ],
     cancellationPolicy: "Free cancellation up to 48 hours before check-in",
   },
-]
+];
 
+export default function PropertyDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const [id, setId] = useState<string>("");
+  const router = useRouter();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [checkIn, setCheckIn] = useState<Date>();
+  const [checkOut, setCheckOut] = useState<Date>();
+  const [guests, setGuests] = useState(2);
 
-export default function PropertyDetailPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [isFavorited, setIsFavorited] = useState(false)
-  const [checkIn, setCheckIn] = useState<Date>()
-  const [checkOut, setCheckOut] = useState<Date>()
-  const [guests, setGuests] = useState(2)
+  // Resolve params in useEffect
+  useEffect(() => {
+    params.then((p) => setId(p.id));
+  }, [params]);
 
   // Find the property by ID - in real app this would be an API call
-  const property = mockProperties.find(p => p.id === params.id) || mockProperties[0]
-  const savings = property.originalPrice - property.price
+  const property = mockProperties.find((p) => p.id === id) || mockProperties[0];
+  const savings = property.originalPrice - property.price;
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % property.images.length)
-  }
+    setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
+  };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length)
-  }
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + property.images.length) % property.images.length
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -477,8 +698,16 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
                 <Share className="h-4 w-4 mr-2" />
                 Share
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setIsFavorited(!isFavorited)}>
-                <Heart className={`h-4 w-4 mr-2 ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsFavorited(!isFavorited)}
+              >
+                <Heart
+                  className={`h-4 w-4 mr-2 ${
+                    isFavorited ? "fill-red-500 text-red-500" : ""
+                  }`}
+                />
                 Save
               </Button>
             </div>
@@ -492,11 +721,11 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
           <div className="lg:col-span-2 space-y-8">
             {/* Image Gallery */}
             <div className="relative aspect-[16/10] rounded-xl overflow-hidden">
-                <img
-                  src={property.images[currentImageIndex] || "/placeholder.svg"}
-                  alt={property.title}
-                  className="w-full h-full object-cover"
-                />
+              <img
+                src={property.images[currentImageIndex] || "/placeholder.svg"}
+                alt={property.title}
+                className="w-full h-full object-cover"
+              />
 
               {/* Navigation Buttons */}
               <button
@@ -528,7 +757,9 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
               {/* Badges */}
               <div className="absolute top-4 left-4 flex gap-2">
                 {property.discount && (
-                  <Badge className="bg-primary text-primary-foreground">-{property.discount}%</Badge>
+                  <Badge className="bg-primary text-primary-foreground">
+                    -{property.discount}%
+                  </Badge>
                 )}
                 {property.isVerified && (
                   <Badge className="bg-green-500 text-white">
@@ -547,7 +778,9 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
                   <div className="flex items-center gap-1">
                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     <span className="font-semibold">{property.rating}</span>
-                    <span className="text-muted-foreground">({property.reviews} reviews)</span>
+                    <span className="text-muted-foreground">
+                      ({property.reviews} reviews)
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground">
@@ -578,7 +811,9 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
                 </div>
                 <div>
                   <p className="font-semibold">Hosted by {property.host}</p>
-                  <p className="text-sm text-muted-foreground">Superhost • 3 years hosting</p>
+                  <p className="text-sm text-muted-foreground">
+                    Superhost • 3 years hosting
+                  </p>
                 </div>
               </div>
 
@@ -587,12 +822,16 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
               {/* Description */}
               <div>
                 <h3 className="text-xl font-semibold mb-3">About this place</h3>
-                <p className="text-muted-foreground leading-relaxed">{property.description}</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  {property.description}
+                </p>
               </div>
 
               {/* Amenities */}
               <div>
-                <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
+                <h3 className="text-xl font-semibold mb-4">
+                  What this place offers
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   {property.amenities.map((amenity) => {
                     const icons: Record<string, any> = {
@@ -601,14 +840,14 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
                       Kitchen: Coffee,
                       Parking: Car,
                       Gym: Dumbbell,
-                    }
-                    const Icon = icons[amenity] || Wifi
+                    };
+                    const Icon = icons[amenity] || Wifi;
                     return (
                       <div key={amenity} className="flex items-center gap-3">
                         <Icon className="h-5 w-5 text-muted-foreground" />
                         <span>{amenity}</span>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -616,12 +855,12 @@ export default function PropertyDetailPage({ params }: { params: { id: string } 
           </div>
 
           {/* Booking Sidebar */}
-            <div className="space-y-6">
-              <BookingCard property={property} />
-              <StakingCard />
-            </div>
+          <div className="space-y-6">
+            <BookingCard property={property} />
+            <StakingCard />
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

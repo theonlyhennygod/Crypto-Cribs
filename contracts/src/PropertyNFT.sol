@@ -68,6 +68,7 @@ contract PropertyNFT is ERC721, ERC721URIStorage, Ownable, ReentrancyGuard, Paus
     mapping(uint256 => bool) public verificationStatus;
     mapping(address => uint256[]) public ownerProperties;
     mapping(string => uint256) public locationPriceIndex; // location => price per sqft
+    mapping(address => bool) public authorizedContracts; // Allow other contracts to manage properties
 
     // Events
     event PropertyMinted(uint256 indexed tokenId, address indexed owner, string name, uint256 valuation);
@@ -507,10 +508,26 @@ contract PropertyNFT is ERC721, ERC721URIStorage, Ownable, ReentrancyGuard, Paus
         locationPriceIndex[location] = pricePerSqFt;
     }
 
+    /**
+     * @dev Authorize a contract to manage properties
+     */
+    function authorizeContract(address contractAddress) external onlyOwner {
+        authorizedContracts[contractAddress] = true;
+    }
+
+    /**
+     * @dev Remove authorization from a contract
+     */
+    function unauthorizeContract(address contractAddress) external onlyOwner {
+        authorizedContracts[contractAddress] = false;
+    }
+
     // ========== INTERNAL FUNCTIONS ==========
 
     function _isAuthorizedToUpdate(uint256 tokenId, address user) internal view returns (bool) {
-        return ownerOf(tokenId) == user || propertyShares[tokenId].ownerShares[user] > 0;
+        return ownerOf(tokenId) == user || 
+               propertyShares[tokenId].ownerShares[user] > 0 || 
+               authorizedContracts[user];
     }
 
     function calculateSharePrice(uint256 tokenId) internal view returns (uint256) {
