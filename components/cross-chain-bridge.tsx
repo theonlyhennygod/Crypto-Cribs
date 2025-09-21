@@ -37,7 +37,7 @@ export function CrossChainBridge() {
         // Bridge from XRPL to Flare
         const hash = await sendXRPPayment(
           Number.parseFloat(amount),
-          "rBridgeContractAddress123456789", // Mock bridge contract
+          "rHXpwL4haYpmFptUyN51Xu1fAkjkZDqAZa", // Primary wallet address
           `Bridge to Flare: ${flareWallet?.address}`
         );
         setTxHash(hash);

@@ -58,9 +58,11 @@ export const FLARE_NETWORKS = {
 export const CURRENT_XRPL_NETWORK = XRPL_NETWORKS.testnet
 export const CURRENT_FLARE_NETWORK = FLARE_NETWORKS.coston2
 
+import { getPrimaryWalletAddress } from './wallet-config';
+
 // Default addresses for testing
 export const DEFAULT_ADDRESSES = {
-  xrplEscrow: "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH", // Testnet escrow address
+  xrplEscrow: getPrimaryWalletAddress(), // Primary wallet address with active transactions
   flareEscrow: "0x742d35Cc6634C0532925a3b8D46CBF20b67e7c7B", // Testnet escrow address
 }
 

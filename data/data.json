@@ -333,6 +333,16 @@
           "network": "XRPL Testnet",
           "description": "Real GemWallet address for testing XRPL payments"
         }
+      },
+      "main": {
+        "gemWallet": {
+          "address": "rHXpwL4haYpmFptUyN51Xu1fAkjkZDqAZa",
+          "network": "XRPL Testnet",
+          "description": "Primary GemWallet address with active transactions",
+          "balance": "8.82",
+          "verified": true,
+          "transactionHistory": true
+        }
       }
     },
     "networks": {

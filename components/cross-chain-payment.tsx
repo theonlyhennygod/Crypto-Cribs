@@ -141,7 +141,7 @@ export function CrossChainPayment({
 
       const memo = `booking:${bookingId}`
       const txHash = await xrpl.sendPayment(
-        recipientAddress || "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH", // Default testnet address
+        recipientAddress || "rHXpwL4haYpmFptUyN51Xu1fAkjkZDqAZa", // Primary wallet address
         selectedAmount.toString(),
         memo
       )
@@ -164,7 +164,7 @@ export function CrossChainPayment({
       await fdc.submitAttestationRequest(
         txHash,
         xrpl.address!,
-        recipientAddress || "rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH",
+        recipientAddress || "rHXpwL4haYpmFptUyN51Xu1fAkjkZDqAZa",
         selectedAmount.toString()
       )
 
@@ -397,7 +397,7 @@ export function CrossChainPayment({
               <div className="space-y-2">
                 <Label>Recipient Address (Optional)</Label>
                 <Input
-                  placeholder="rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH"
+                  placeholder="rHXpwL4haYpmFptUyN51Xu1fAkjkZDqAZa"
                   value={recipientAddress}
                   onChange={(e) => setRecipientAddress(e.target.value)}
                 />

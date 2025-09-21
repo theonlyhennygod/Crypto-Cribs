@@ -413,7 +413,7 @@ export function BookingCard({ property }: BookingCardProps) {
       const { submitTransaction } = await import("@gemwallet/api");
       
       // Ensure we have a valid XRPL destination address
-      const destinationAddress = "rw6gZcjxbKHBN8yEJDMErMhja6jwga6xpT"; // Your address for demo
+      const destinationAddress = "rHXpwL4haYpmFptUyN51Xu1fAkjkZDqAZa"; // Primary wallet address with active transactions
       
       const payment = {
         TransactionType: "Payment",
