@@ -28,7 +28,7 @@ Drop images into /public/screenshots/ and reference here as needed.
 <!--
 Replace this with a Loom video link, e.g. https://youtu.be/XXXXXXXXXXX
 -->
-[Watch the full walk-through with audio](https://your-loom-link.com)
+[Watch the full walk-through with audio](https://www.loom.com/share/5f933b97df0d441ebaa248cdaff053af?sid=52a53caf-6ff9-4ead-a9fb-f2305b4e973e)
 
 ---
 
