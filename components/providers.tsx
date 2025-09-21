@@ -11,6 +11,7 @@ export function Providers({ children }: { children: ReactNode }) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      storageKey="crypto-cribs-theme"
     >
       <WalletProvider>{children}</WalletProvider>
     </ThemeProvider>
