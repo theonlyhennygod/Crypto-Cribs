@@ -7,7 +7,7 @@
 <!--
 Replace the link below with your YouTube/Vimeo/Loom/Google Drive demo video
 -->
-[![Watch the demo]([https://img.youtube.com/vi/XXXXXXXXXXX/hqdefault.jpg)](https://your-demo-link.com](https://youtu.be/PkxyhYXvY-I))
+[![Watch the demo]([https://youtu.be/PkxyhYXvY-I])
 
 ---
 
