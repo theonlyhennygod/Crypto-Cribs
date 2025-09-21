@@ -6,6 +6,8 @@ import { WalletStatus } from "./wallet-status";
 import { ModeToggle } from "./mode-toggle";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -28,17 +30,25 @@ export function Navigation() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                CC
+          <Link href="/" className="flex items-center">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-2"
+            >
+              <div className="w-8 h-8 relative">
+                <Image
+                  src="/cryptocribs.png"
+                  alt="Crypto Cribs Logo"
+                  width={32}
+                  height={32}
+                  className="rounded-lg"
+                />
+              </div>
+              <span className="text-xl font-bold hover:text-primary transition-colors">
+                Crypto Cribs
               </span>
-            </div>
-            <span className="text-xl font-bold">Crypto Cribs</span>
-          </motion.div>
+            </motion.div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">

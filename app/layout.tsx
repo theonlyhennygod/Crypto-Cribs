@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   description:
     "Book your next luxury stay with cryptocurrency. Enjoy transparent fees, cross-chain payments, and exclusive rewards.",
   generator: "v0.app",
+  icons: {
+    icon: "/cryptocribs.png",
+    shortcut: "/cryptocribs.png",
+    apple: "/cryptocribs.png",
+  },
 };
 
 export default function RootLayout({
