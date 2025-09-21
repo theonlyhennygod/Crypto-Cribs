@@ -11,6 +11,7 @@ import {
   isInstalled,
   getAddress,
   getNetwork,
+  getBalance,
   submitTransaction,
 } from "@gemwallet/api";
 
@@ -402,11 +403,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         throw new Error("No accounts found - please unlock MetaMask");
       }
 
-      // Switch to Flare Network (Chain ID: 14)
+      // Switch to Flare Coston2 Testnet (Chain ID: 114)
       try {
         await provider.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0xe" }], // 14 in hex
+          params: [{ chainId: "0x72" }], // 114 in hex
         });
       } catch (switchError: any) {
         // If network doesn't exist, add it
@@ -415,15 +416,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             method: "wallet_addEthereumChain",
             params: [
               {
-                chainId: "0xe",
-                chainName: "Flare Network",
+                chainId: "0x72", // 114 in hex
+                chainName: "Flare Testnet Coston2",
                 nativeCurrency: {
-                  name: "Flare",
-                  symbol: "FLR",
+                  name: "Coston2 Flare",
+                  symbol: "C2FLR",
                   decimals: 18,
                 },
-                rpcUrls: ["https://flare-api.flare.network/ext/C/rpc"],
-                blockExplorerUrls: ["https://flare-explorer.flare.network/"],
+                rpcUrls: ["https://coston2-api.flare.network/ext/C/rpc"],
+                blockExplorerUrls: ["https://coston2.testnet.flarescan.com/"],
               },
             ],
           });
@@ -450,10 +451,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         ? (Number.parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4)
         : "0.0000";
 
-      // If balance is 0, show demo balance for testnet
+      // If balance is 0, show demo balance for Coston2 testnet
       if (balanceInEth === "0.0000") {
         balanceInEth = "0.1250"; // Demo C2FLR balance
-        console.log("📡 Using demo C2FLR balance for testnet display");
+        console.log("📡 Using demo C2FLR balance for Coston2 testnet display");
       }
 
       setStateWithPersistence((prev) => ({
