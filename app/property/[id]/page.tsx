@@ -46,7 +46,7 @@ const mockProperty = {
   cancellationPolicy: "Free cancellation up to 48 hours before check-in",
 }
 
-export default function PropertyDetailPage() {
+export default function PropertyDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isFavorited, setIsFavorited] = useState(false)
@@ -54,14 +54,16 @@ export default function PropertyDetailPage() {
   const [checkOut, setCheckOut] = useState<Date>()
   const [guests, setGuests] = useState(2)
 
-  const savings = mockProperty.originalPrice - mockProperty.price
+  // Find the property by ID - in real app this would be an API call
+  const property = mockProperties.find(p => p.id === params.id) || mockProperties[0]
+  const savings = property.originalPrice - property.price
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % mockProperty.images.length)
+    setCurrentImageIndex((prev) => (prev + 1) % property.images.length)
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + mockProperty.images.length) % mockProperty.images.length)
+    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length)
   }
 
   return (
@@ -95,8 +97,8 @@ export default function PropertyDetailPage() {
             {/* Image Gallery */}
             <div className="relative aspect-[16/10] rounded-xl overflow-hidden">
               <img
-                src={mockProperty.images[currentImageIndex] || "/placeholder.svg"}
-                alt={mockProperty.title}
+                src={property.images[currentImageIndex] || "/placeholder.svg"}
+                alt={property.title}
                 className="w-full h-full object-cover"
               />
 
@@ -116,7 +118,7 @@ export default function PropertyDetailPage() {
 
               {/* Image Indicators */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                {mockProperty.images.map((_, index) => (
+                {property.images.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -129,10 +131,10 @@ export default function PropertyDetailPage() {
 
               {/* Badges */}
               <div className="absolute top-4 left-4 flex gap-2">
-                {mockProperty.discount && (
-                  <Badge className="bg-primary text-primary-foreground">-{mockProperty.discount}%</Badge>
+                {property.discount && (
+                  <Badge className="bg-primary text-primary-foreground">-{property.discount}%</Badge>
                 )}
-                {mockProperty.isVerified && (
+                {property.isVerified && (
                   <Badge className="bg-green-500 text-white">
                     <Shield className="h-3 w-3 mr-1" />
                     Verified
@@ -145,16 +147,16 @@ export default function PropertyDetailPage() {
             <div className="space-y-6">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <h1 className="text-3xl font-bold">{mockProperty.title}</h1>
+                  <h1 className="text-3xl font-bold">{property.title}</h1>
                   <div className="flex items-center gap-1">
                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{mockProperty.rating}</span>
-                    <span className="text-muted-foreground">({mockProperty.reviews} reviews)</span>
+                    <span className="font-semibold">{property.rating}</span>
+                    <span className="text-muted-foreground">({property.reviews} reviews)</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <MapPin className="h-4 w-4" />
-                  <span>{mockProperty.location}</span>
+                  <span>{property.location}</span>
                 </div>
               </div>
 
@@ -162,10 +164,10 @@ export default function PropertyDetailPage() {
               <div className="flex items-center gap-6 text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  <span>{mockProperty.guests} guests</span>
+                  <span>{property.guests} guests</span>
                 </div>
-                <div>{mockProperty.bedrooms} bedrooms</div>
-                <div>{mockProperty.bathrooms} bathrooms</div>
+                <div>{property.bedrooms} bedrooms</div>
+                <div>{property.bathrooms} bathrooms</div>
               </div>
 
               <Separator />
@@ -173,13 +175,13 @@ export default function PropertyDetailPage() {
               {/* Host Info */}
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-semibold">
-                  {mockProperty.host
+                  {property.host
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
                 </div>
                 <div>
-                  <p className="font-semibold">Hosted by {mockProperty.host}</p>
+                  <p className="font-semibold">Hosted by {property.host}</p>
                   <p className="text-sm text-muted-foreground">Superhost • 3 years hosting</p>
                 </div>
               </div>
@@ -189,14 +191,14 @@ export default function PropertyDetailPage() {
               {/* Description */}
               <div>
                 <h3 className="text-xl font-semibold mb-3">About this place</h3>
-                <p className="text-muted-foreground leading-relaxed">{mockProperty.description}</p>
+                <p className="text-muted-foreground leading-relaxed">{property.description}</p>
               </div>
 
               {/* Amenities */}
               <div>
                 <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  {mockProperty.amenities.map((amenity) => {
+                  {property.amenities.map((amenity) => {
                     const icons: Record<string, any> = {
                       WiFi: Wifi,
                       Pool: Pool,
@@ -219,7 +221,7 @@ export default function PropertyDetailPage() {
 
           {/* Booking Sidebar */}
           <div className="space-y-6">
-            <BookingCard property={mockProperty} />
+            <BookingCard property={property} />
             <StakingCard />
           </div>
         </div>
