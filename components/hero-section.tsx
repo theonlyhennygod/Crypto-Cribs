@@ -51,8 +51,8 @@ export function HeroSection() {
           transition={{ duration: 0.8 }}
           className="mb-6"
         >
-          <span className="text-sm font-mono text-muted-foreground tracking-wider uppercase">
-            Cross-Chain Travel Revolution
+          <span className="text-sm font-mono text-primary/80 tracking-wider uppercase bg-primary/10 px-4 py-2 rounded-full border border-primary/20">
+            🏠 Crypto + Chill = Cribs 🚀
           </span>
         </motion.div>
 
@@ -62,9 +62,13 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-6xl md:text-8xl font-bold mb-8 text-balance leading-tight"
         >
-          Travel Without
+          <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Crypto Cribs
+          </span>
           <br />
-          <span className="text-primary">Limitation</span>
+          <span className="text-foreground">Where DeFi Meets</span>
+          <br />
+          <span className="text-primary animate-pulse">Paradise</span>
         </motion.h1>
 
         <motion.p
@@ -73,8 +77,10 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto text-pretty leading-relaxed"
         >
-          Disrupt the travel industry with transparent fees, instant cross-chain payments via XRPL & Flare, and
-          exclusive rewards that make every journey extraordinary.
+          Skip the middleman, dodge the fees, and pay with <span className="text-primary font-semibold">XRP</span> or <span className="text-purple-400 font-semibold">FLR</span>. 
+          Book luxury stays, earn crypto rewards, and join the most exclusive travel community in Web3. 
+          <br />
+          <span className="text-sm mt-2 block text-primary/80">💎 Diamond hands deserve diamond destinations 💎</span>
         </motion.p>
 
         <motion.div
@@ -85,18 +91,18 @@ export function HeroSection() {
         >
           <Button
             size="lg"
-            className="group bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg"
+            className="group bg-gradient-to-r from-primary via-purple-500 to-pink-500 hover:from-primary/90 hover:via-purple-500/90 hover:to-pink-500/90 text-white px-8 py-4 text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300"
             onClick={handleLaunchDApp}
           >
-            {isConnected ? "Enter dApp" : "Launch dApp"}
+            {isConnected ? "🚀 Enter the Cribs" : "🔗 Connect & Chill"}
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="px-8 py-4 text-lg border-border hover:bg-secondary bg-transparent"
+            className="px-8 py-4 text-lg border-primary/30 hover:bg-primary/10 bg-transparent text-primary hover:text-primary font-semibold"
           >
-            View Demo
+            💎 View Demo
           </Button>
         </motion.div>
 
@@ -109,29 +115,29 @@ export function HeroSection() {
         >
           <motion.div
             whileHover={{ scale: 1.05, y: -5 }}
-            className="bg-card border border-border rounded-xl p-6 backdrop-blur-sm"
+            className="bg-gradient-to-br from-card/50 to-primary/5 border border-primary/20 rounded-xl p-6 backdrop-blur-sm hover:border-primary/40 transition-all duration-300"
           >
-            <Wallet className="h-12 w-12 text-primary mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold mb-2">Dual Wallet Support</h3>
-            <p className="text-muted-foreground">MetaMask for Flare EVM & Gem Wallet for XRPL integration</p>
+            <div className="text-4xl mb-4">🔗</div>
+            <h3 className="text-xl font-semibold mb-2 text-primary">Cross-Chain Magic</h3>
+            <p className="text-muted-foreground">Pay with XRP or FLR seamlessly. Your keys, your crypto, your cribs.</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05, y: -5 }}
-            className="bg-card border border-border rounded-xl p-6 backdrop-blur-sm"
+            className="bg-gradient-to-br from-card/50 to-purple-500/5 border border-purple-500/20 rounded-xl p-6 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300"
           >
-            <Globe className="h-12 w-12 text-primary mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold mb-2">Transparent Fees</h3>
-            <p className="text-muted-foreground">Cut Airbnb's massive fees in half with blockchain efficiency</p>
+            <div className="text-4xl mb-4">💸</div>
+            <h3 className="text-xl font-semibold mb-2 text-purple-400">Zero BS Fees</h3>
+            <p className="text-muted-foreground">Ditch Airbnb's 15%+ fees. Keep your gains, spend on experiences.</p>
           </motion.div>
 
           <motion.div
             whileHover={{ scale: 1.05, y: -5 }}
-            className="bg-card border border-border rounded-xl p-6 backdrop-blur-sm"
+            className="bg-gradient-to-br from-card/50 to-pink-500/5 border border-pink-500/20 rounded-xl p-6 backdrop-blur-sm hover:border-pink-500/40 transition-all duration-300"
           >
-            <Gift className="h-12 w-12 text-primary mb-4 mx-auto" />
-            <h3 className="text-xl font-semibold mb-2">Daily Rewards</h3>
-            <p className="text-muted-foreground">Win free vacations, NFTs, and exclusive discounts</p>
+            <div className="text-4xl mb-4">🎁</div>
+            <h3 className="text-xl font-semibold mb-2 text-pink-400">Daily Alpha Drops</h3>
+            <p className="text-muted-foreground">Win NFTs, free stays, and exclusive access to the dopest properties.</p>
           </motion.div>
         </motion.div>
 
