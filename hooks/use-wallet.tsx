@@ -216,43 +216,61 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       try {
         console.log("💎 Getting real XRPL balance directly from GemWallet...");
         
-        // Use GemWallet API directly to get real balance
-        const { getBalance } = await import("@gemwallet/api");
-        const balanceResponse = await getBalance();
-        
-        if (balanceResponse.result && balanceResponse.result.balance) {
-          const xrpBalance = balanceResponse.result.balance;
+        // Check if GemWallet is available
+        if (typeof window !== 'undefined' && (window as any).gemWallet) {
+          // Use GemWallet API directly to get real balance
+          const gemWalletApi = await import("@gemwallet/api");
           
-          setStateWithPersistence((prev) => ({
-            ...prev,
-            gemBalance: xrpBalance,
-            xrplWallet: { ...prev.xrplWallet, balance: xrpBalance },
-          }));
-          
-          console.log("✅ Real GemWallet balance:", xrpBalance, "XRP");
-        } else {
-          console.log("⚠️ Could not get balance from GemWallet API");
-        }
-      } catch (error) {
-        console.warn("Failed to get GemWallet balance:", error);
-        
-        // Try the XRPL API as fallback
-        try {
-          const response = await fetch(`/api/xrpl/balance?address=${state.gemAddress}`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success) {
+          // Check if getBalance function exists
+          if (typeof gemWalletApi.getBalance === 'function') {
+            const balanceResponse = await gemWalletApi.getBalance();
+            
+            if (balanceResponse?.result && balanceResponse.result.balance) {
+              const xrpBalance = balanceResponse.result.balance;
+              
               setStateWithPersistence((prev) => ({
                 ...prev,
-                gemBalance: data.balance,
-                xrplWallet: { ...prev.xrplWallet, balance: data.balance },
+                gemBalance: xrpBalance,
+                xrplWallet: { ...prev.xrplWallet, balance: xrpBalance },
               }));
-              console.log("✅ XRPL API balance:", data.balance, "XRP");
+              
+              console.log("✅ Real GemWallet balance:", xrpBalance, "XRP");
+              return; // Success, no need to try fallback
             }
+          } else {
+            console.log("⚠️ GemWallet getBalance function not available");
           }
-        } catch (apiError) {
-          console.warn("Both GemWallet and XRPL API failed:", apiError);
+        } else {
+          console.log("⚠️ GemWallet not available in window");
         }
+        
+        // Fallback to XRPL API
+        console.log("🔄 Trying XRPL API fallback...");
+        const response = await fetch(`/api/xrpl/balance?address=${state.gemAddress}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setStateWithPersistence((prev) => ({
+              ...prev,
+              gemBalance: data.balance,
+              xrplWallet: { ...prev.xrplWallet, balance: data.balance },
+            }));
+            console.log("✅ XRPL API balance:", data.balance, "XRP");
+          } else {
+            console.log("⚠️ XRPL API returned error:", data.error);
+          }
+        } else {
+          console.log("⚠️ XRPL API request failed with status:", response.status);
+        }
+      } catch (error) {
+        console.warn("Failed to get balance from both GemWallet and XRPL API:", error);
+        
+        // Set a fallback balance to prevent UI issues
+        setStateWithPersistence((prev) => ({
+          ...prev,
+          gemBalance: "0.00",
+          xrplWallet: { ...prev.xrplWallet, balance: "0.00" },
+        }));
       }
     }
   };
@@ -263,19 +281,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   ) => {
     setState((prev) => {
       const newState = updater(prev);
-      // Save persistable state to localStorage
-      saveWalletState({
-        metamaskAddress: newState.metamaskAddress,
-        metamaskBalance: newState.metamaskBalance,
-        metamaskConnected: newState.metamaskConnected,
-        gemAddress: newState.gemAddress,
-        gemBalance: newState.gemBalance,
-        gemConnected: newState.gemConnected,
-        activeWallet: newState.activeWallet,
-        isConnected: newState.isConnected,
-        xrplWallet: newState.xrplWallet,
-        flareWallet: newState.flareWallet,
-      });
+      
+      // Save to localStorage only in browser environment
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+          console.log("💾 Wallet state saved:", newState);
+        } catch (error) {
+          console.warn("Failed to save wallet state to localStorage:", error);
+        }
+      }
+      
       return newState;
     });
   };

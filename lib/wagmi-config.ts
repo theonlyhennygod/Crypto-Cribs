@@ -1,6 +1,9 @@
 import { createConfig, http } from "wagmi";
 import { metaMask, injected, walletConnect } from "wagmi/connectors";
 
+// Prevent multiple WalletConnect instances
+let walletConnectInstance: any = null;
+
 // Define Coston2 chain if not available in wagmi/chains
 const coston2Chain = {
   id: 114,
@@ -38,9 +41,13 @@ export const config = createConfig({
         iconUrl: "https://cryptocribs.com/logo.png",
       },
     }),
-    walletConnect({
-      projectId: "155ada53ca324b0c79b465bbc237717a", // User's WalletConnect project ID
-    }),
+    // Create WalletConnect instance only once
+    ...(walletConnectInstance ? [] : [
+      (walletConnectInstance = walletConnect({
+        projectId: "155ada53ca324b0c79b465bbc237717a", // User's WalletConnect project ID
+        showQrModal: false, // Prevent multiple modals
+      }))
+    ]),
   ],
   transports: {
     [coston2Chain.id]: http("https://coston2-api.flare.network/ext/C/rpc"),
