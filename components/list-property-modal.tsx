@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import * as React from "react"
 import { motion } from "framer-motion"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -26,6 +27,9 @@ import {
   Globe
 } from "lucide-react"
 import { useWallet } from "@/hooks/use-wallet"
+import { useBookingWrite } from "@/hooks/use-contract"
+import { useAccount } from "wagmi"
+import { toast } from "sonner"
 
 interface ListingFormData {
   title: string
@@ -56,6 +60,8 @@ interface AntifraudCheck {
 
 export function ListPropertyModal({ children }: { children: React.ReactNode }) {
   const { isConnected, walletAddress } = useWallet()
+  const { address } = useAccount()
+  const { listProperty, isPending, isConfirming, isSuccess, error } = useBookingWrite()
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -193,21 +199,90 @@ export function ListPropertyModal({ children }: { children: React.ReactNode }) {
   }
 
   const handleSubmit = async () => {
-    if (!isConnected) {
-      alert("Please connect your wallet first")
+    if (!address) {
+      toast.error("Please connect your wallet first")
+      return
+    }
+
+    if (!formData.title || !formData.city || !formData.price || !formData.maxGuests) {
+      toast.error("Please fill in all required fields")
       return
     }
 
     setIsSubmitting(true)
-    await runAntifraudChecks()
     
-    // Simulate IPFS upload
-    const mockIpfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
-    setFormData(prev => ({ ...prev, ipfsHash: mockIpfsHash }))
-    
-    console.log("[v0] Property listing submitted with antifraud protection:", formData)
-    setIsSubmitting(false)
+    try {
+      // Run antifraud checks first
+      await runAntifraudChecks()
+      
+      // Simulate IPFS upload for property metadata and images
+      const mockIpfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
+      setFormData(prev => ({ ...prev, ipfsHash: mockIpfsHash }))
+      
+      // Prepare data for smart contract
+      const priceInCents = Math.floor(parseFloat(formData.price) * 100) // Convert to cents
+      const maxGuests = parseInt(formData.maxGuests)
+      const location = `${formData.city}, ${formData.country}`
+      
+      // Call smart contract to list property
+      listProperty(
+        formData.title,
+        location,
+        BigInt(priceInCents),
+        formData.amenities,
+        BigInt(maxGuests)
+      )
+      
+      toast.success("Property listing transaction submitted!")
+      console.log("[Crypto Cribs] Property listing submitted:", {
+        name: formData.title,
+        location,
+        priceInCents,
+        amenities: formData.amenities,
+        maxGuests
+      })
+      
+    } catch (error) {
+      console.error("Error submitting property:", error)
+      toast.error("Failed to submit property listing")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
+
+  // Handle transaction success
+  React.useEffect(() => {
+    if (isSuccess) {
+      toast.success("Property listed successfully on the blockchain!")
+      setOpen(false)
+      setStep(1)
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        propertyType: "",
+        address: "",
+        city: "",
+        country: "",
+        price: "",
+        bedrooms: "",
+        bathrooms: "",
+        maxGuests: "",
+        amenities: [],
+        images: null,
+        gpsCoordinates: null,
+        ipfsHash: "",
+        depositAmount: "50",
+        hostStakeAmount: "10",
+      })
+    }
+  }, [isSuccess])
+
+  React.useEffect(() => {
+    if (error) {
+      toast.error(`Transaction failed: ${error.message}`)
+    }
+  }, [error])
 
   const allChecksPassed = antifraudChecks.filter(c => c.required).every(c => c.status === "passed")
 
@@ -504,9 +579,12 @@ export function ListPropertyModal({ children }: { children: React.ReactNode }) {
                 </Button>
                 <Button 
                   onClick={handleSubmit} 
-                  disabled={!formData.gpsCoordinates || isSubmitting}
+                  disabled={!formData.gpsCoordinates || isSubmitting || isPending || isConfirming}
                 >
-                  Submit for Verification
+                  {isPending ? "Confirm in Wallet..." : 
+                   isConfirming ? "Confirming on Blockchain..." :
+                   isSubmitting ? "Processing..." : 
+                   "List Property on Blockchain"}
                 </Button>
               </div>
             </motion.div>
