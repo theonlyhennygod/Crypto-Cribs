@@ -58,7 +58,7 @@ export function CryptoTestimonialsSection() {
   ]
 
   return (
-    <section className="py-24 bg-gradient-to-b from-secondary/20 to-background">
+    <section className="py-24 bg-gradient-to-b from-secondary/20 to-background" suppressHydrationWarning>
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

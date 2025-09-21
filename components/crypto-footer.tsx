@@ -35,7 +35,7 @@ export function CryptoFooter() {
   ]
 
   return (
-    <footer className="bg-gradient-to-b from-background to-secondary/20 border-t border-border/50">
+    <footer className="bg-gradient-to-b from-background to-secondary/20 border-t border-border/50" suppressHydrationWarning>
       <div className="container mx-auto px-6 py-16">
         {/* Main Footer Content */}
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">

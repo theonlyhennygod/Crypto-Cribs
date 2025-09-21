@@ -3,15 +3,20 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Wallet, Globe, Gift } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { WalletConnectModal } from "./wallet-connect-modal"
 import { useWallet } from "@/hooks/use-wallet"
 
 export function HeroSection() {
   const [showConnectModal, setShowConnectModal] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { metamaskConnected, gemConnected } = useWallet()
 
   const isConnected = metamaskConnected || gemConnected
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleLaunchDApp = () => {
     if (!isConnected) {
@@ -23,7 +28,7 @@ export function HeroSection() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16" suppressHydrationWarning>
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
@@ -94,7 +99,7 @@ export function HeroSection() {
             className="group bg-gradient-to-r from-primary via-purple-500 to-pink-500 hover:from-primary/90 hover:via-purple-500/90 hover:to-pink-500/90 text-white px-8 py-4 text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300"
             onClick={handleLaunchDApp}
           >
-            {isConnected ? "🚀 Enter the Cribs" : "🔗 Connect & Chill"}
+{mounted ? (isConnected ? "🚀 Enter the Cribs" : "🔗 Connect & Chill") : "🔗 Connect & Chill"}
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
           <Button
