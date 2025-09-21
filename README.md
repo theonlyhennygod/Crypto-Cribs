@@ -1,232 +1,489 @@
-# Crypto Cribs - Decentralized Travel Platform
-
-> **Revolutionizing travel with XRPL & Flare Network integration**
-
-A cutting-edge decentralized travel booking platform that combines the speed of XRPL payments with the smart contract capabilities of Flare Network, creating the future of travel bookings with real cross-chain DeFi integration.
-
-![Crypto Cribs Hero](https://img.shields.io/badge/Status-Live%20Demo-brightgreen) ![XRPL](https://img.shields.io/badge/XRPL-Testnet-blue) ![Flare](https://img.shields.io/badge/Flare-Coston2-orange) ![Next.js](https://img.shields.io/badge/Next.js-14-black)
-
-## 🎥 Demo Video
-
-> **Watch the live demo showcasing real XRPL and Flare Network integration**
-
-*Demo video coming soon - showcasing real wallet transactions and cross-chain payments*
-
-## 📸 Screenshots
-
-### 🏡 Property Booking Interface
-![Property Booking](public/image1.png)
-
-### 🏢 Host Dashboard
-![Host Dashboard](public/image2.png)
-
-### 💰 DeFi Staking Hub
-![DeFi Hub](public/image3.png)
-
-### 🔍 Property Marketplace
-![Property Marketplace](public/image4.png)
-
-## 🌟 Live Demo Features
-
-### 🏡 Property Booking with Real Wallets
-Experience seamless property bookings using your actual GemWallet and MetaMask with real testnet funds.
-*Modern apartment booking with dual wallet integration - GemWallet (10 XRP) + MetaMask (98.59 C2FLR)*
-
-### 🏢 Host Dashboard & Property Management
-Complete host experience with property management, earnings tracking, and blockchain analytics.
-*Professional host dashboard with real-time earnings and property management tools*
-
-### 💰 DeFi Travel Hub - Stake & Earn
-Innovative DeFi features allowing users to stake tokens while saving for their next adventure.
-*Stake & Save for Travel - Earn $2,840 in portfolio value with 1250 FLR staked*
-
-### 🔍 Property Marketplace
-Browse verified properties with transparent pricing in XRP/FLR and traditional platforms comparison.
-*Curated property listings with cross-chain payment options and savings indicators*
-
-## ⚡ Key Features
-
-### 🚀 **Cross-Chain Payments**
-- **XRPL Integration**: Lightning-fast, low-cost payments via GemWallet
-- **Flare Network**: Smart contract escrow and DeFi functionality
-- **Real-time Bridge**: Seamless XRP ↔ FLR conversion using FTSOv2 oracles
-- **Live Testnet**: Working with actual testnet funds (10 XRP + 98.59 C2FLR)
-
-### 🛡️ **Smart Contract Security**
-- **Deployed Contracts**: Live on Coston2 testnet
-- **Property Escrow**: Secure booking with automatic release
-- **NFT Ownership**: ERC-721 property tokens
-- **Fraud Protection**: Advanced wallet verification
-
-### 📊 **DeFi Integration**
-- **Staking Rewards**: Earn while you save for travel
-- **Yield Farming**: Multiple token pair opportunities
-- **Portfolio Tracking**: Real-time value monitoring
-- **Travel Savings Goals**: Gamified saving experience
-
-### 🎯 **Real-World Ready**
-- **Actual Wallet Integration**: GemWallet + MetaMask
-- **Live Price Feeds**: FTSOv2 oracle integration
-- **Transaction Verification**: Flare Data Connector (FDC)
-- **Production UI/UX**: Professional travel platform design
-
-## 🛠️ Tech Stack
-
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Frontend** | Next.js 14, TypeScript, Tailwind CSS | Modern React framework with type safety |
-| **Blockchain** | XRPL Testnet, Flare Coston2 | Dual-chain architecture |
-| **Smart Contracts** | Solidity, Foundry | Secure property escrow and NFTs |
-| **Wallets** | GemWallet, MetaMask | Native XRPL and EVM wallet support |
-| **Oracles** | FTSOv2 | Real-time price feeds |
-| **Data** | Flare Data Connector | Cross-chain verification |
-
-## 🚀 Quick Start
-
-### Prerequisites
-- **Node.js** 18+ 
-- **GemWallet** browser extension ([Install](https://gemwallet.app/))
-- **MetaMask** browser extension ([Install](https://metamask.io/))
-- **Testnet Funds**: XRP + C2FLR (faucets provided)
-
-### 1. Clone & Install
-```bash
-git clone https://github.com/yourusername/crypto-cribs.git
-cd crypto-cribs
-npm install
-```
-
-### 2. Environment Setup
-```bash
-cp .env.example .env
-# Contract addresses are pre-configured for Coston2
-```
-
-### 3. Start Development
-```bash
-npm run dev
-# Open http://localhost:3000
-```
-
-### 4. Get Testnet Funds
-- **XRPL Testnet**: [Faucet](https://faucet.altnet.rippletest.net/) (Get 1000 XRP)
-- **Coston2 Testnet**: [Faucet](https://faucet.flare.network/) (Get 100 C2FLR)
-
-## 📱 Wallet Configuration
-
-### GemWallet (XRPL)
-```javascript
-// Automatic network detection
-Network: XRPL Testnet
-Explorer: https://testnet.xrpl.org/
-```
-
-### MetaMask (Flare Coston2)
-```javascript
-Network Name: Flare Testnet Coston2
-RPC URL: https://coston2-api.flare.network/ext/C/rpc
-Chain ID: 114
-Currency: C2FLR
-Explorer: https://coston2.testnet.flarescan.com
-```
-
-## 🏗️ Smart Contract Architecture
-
-### Deployed Contracts (Coston2 Testnet)
-```solidity
-PropertyEscrow:     0xfaD4AD4A892F0e9f6018EB3671E8580b396CdCc1
-PropertyNFT:        0x10Ec5e7be6879bc70363e86780e50bb7831CA5F4
-XRPLFlarebridge:    0x6B5A678ED72CC7A910d3b3EB1CeaeF3FBA53F821
-CryptoCribsBooking: 0xcf01F271DecCDdfd2CF72D3177EC2dC132fEb3a7
-```
-
-### Contract Deployment
-```bash
-cd contracts
-forge script script/Deploy.s.sol --rpc-url $COSTON2_RPC_URL --broadcast
-```
-
-## 🎯 Usage Guide
-
-### 1. **Connect Wallets**
-- Install GemWallet & MetaMask
-- Connect to XRPL Testnet & Coston2
-- Fund wallets via faucets
-
-### 2. **Browse Properties**
-- Explore curated property listings
-- Compare traditional vs crypto pricing
-- View savings with cross-chain payments
-
-### 3. **Make Bookings**
-- Select dates and guests
-- Choose XRP or FLR payment
-- Experience instant cross-chain settlement
-
-### 4. **DeFi Features**
-- Stake FLR tokens for travel savings
-- Earn rewards while planning trips
-- Track portfolio growth in real-time
-
-### 5. **Host Properties**
-- List properties with smart contract escrow
-- Receive payments in XRP/FLR
-- Manage bookings via dashboard
-
-## 🔄 Cross-Chain Flow
-
-```mermaid
-graph LR
-    A[GemWallet] -->|XRP Payment| B[XRPL Testnet]
-    B -->|FDC Verification| C[Flare Data Connector]
-    C -->|Attestation| D[Coston2 Smart Contract]
-    D -->|Escrow Release| E[Property Booking]
-    F[MetaMask] -->|C2FLR Payment| D
-```
-
-## 🌐 Live Demo
-
-**Demo URL**: `http://localhost:3000` (after setup)
-
-**Test Wallets**:
-- **XRPL**: Use your GemWallet with testnet XRP
-- **Flare**: Use your MetaMask with Coston2 C2FLR
-
-**Demo Flow**:
-1. Connect both wallets
-2. Browse properties at `/properties`
-3. Book a property with cross-chain payment
-4. Explore DeFi features at `/defi`
-5. Check host dashboard at `/host`
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
-
-### Development Workflow
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
-
-## 🙏 Acknowledgments
-
-- **XRPL Foundation** for the robust payment infrastructure
-- **Flare Network** for smart contract capabilities and oracles
-- **GemWallet Team** for excellent XRPL wallet integration
-- **MetaMask** for seamless EVM wallet support
-
-## 📞 Support
-
-- **Email**: support@cryptocribs.com
-- **Discord**: [Join our community](https://discord.gg/cryptocribs)
-- **Twitter**: [@CryptoCribs](https://twitter.com/cryptocribs)
+# Crypto-Cribs: Cross-Chain Decentralized Travel & Real Estate DApp
 
 ---
 
-**Built with ❤️ for the future of decentralized travel**
+## 🚀 Demo Video
+
+<!--
+Replace the link below with your YouTube/Vimeo/Loom/Google Drive demo video
+-->
+[![Watch the demo](https://img.youtube.com/vi/XXXXXXXXXXX/hqdefault.jpg)](https://your-demo-link.com)
+
+---
+
+## 🖼️ Screenshots
+
+<!--
+Replace these with actual screenshots of your DApp UI and flows.
+Drop images into /public/screenshots/ and reference here as needed.
+-->
+<img src="public/image1.png" width=600>
+<img src="public/image2.png" width=600>
+<img src="public/image3.png" width=600>
+<img src="public/image4.png" width=600>
+---
+
+## 🎤 Loom/Explainer Video
+
+<!--
+Replace this with a Loom video link, e.g. https://youtu.be/XXXXXXXXXXX
+-->
+[Watch the full walk-through with audio](https://your-loom-link.com)
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Judging Criteria: How CryptoCribs Satisfies the Challenge](#judging-criteria-how-cryptocribs-satisfies-the-challenge)
+- [Architecture](#architecture)
+  - [Tech Stack](#tech-stack)
+  - [High-Level & User Journey Diagrams](#high-level--user-journey-diagrams)
+  - [Cross-Chain Flow](#cross-chain-flow)
+- [Directory Structure](#directory-structure)
+- [Core Implementations](#core-implementations)
+  - [XRPL Integration](#xrpl-integration)
+  - [Flare Network & EVM Smart Contracts](#flare-network--evm-smart-contracts)
+  - [Cross-Chain Bridges (FAssets, FXRP)](#cross-chain-bridges-fassets-fxrp)
+  - [Wallet Integrations (GemWallet, MetaMask)](#wallet-integrations-gemwallet-metamask)
+  - [Booking, Escrow & Payment Flow](#booking-escrow--payment-flow)
+  - [Raffle & NFT Reward Mechanisms](#raffle--nft-reward-mechanisms)
+- [Frontend Structure](#frontend-structure)
+  - [Routing & Pages](#routing--pages)
+  - [Reusable Components](#reusable-components)
+  - [Hooks and Providers](#hooks-and-providers)
+  - [UI & Styles](#ui--styles)
+- [Smart Contracts Architecture](#smart-contracts-architecture)
+- [How To Run Locally](#how-to-run-locally)
+- [How To Deploy](#how-to-deploy)
+- [Security & Compliance](#security--compliance)
+- [Planned Improvements](#planned-improvements)
+- [References & Sources](#references--sources)
+- [Contact & Contribution](#contact--contribution)
+
+---
+
+## Project Overview
+
+CryptoCribs is a decentralized travel and real estate platform that reimagines short-term rentals by replacing high-fee, centralized intermediaries like Airbnb with blockchain-powered transparency and fairness.
+
+**The Problem:**  
+Current platforms charge 15–25% in commissions, force guests to pay 100% upfront, and lock funds until check-in. This creates high costs for travelers, reduced income for hosts, and a lack of trust when refunds depend on centralized companies.
+
+**The Solution:**  
+CryptoCribs introduces a 20% deposit escrow model. Guests secure bookings by depositing 20% of the price into a smart contract. At check-in, funds are automatically released to the host, or refunded if cancellation terms apply. This reduces risk, lowers fees to near zero, and ensures fair handling of funds.
+
+**Unique Features:**
+- **NFT Loyalty & Raffles:** Every booking rewards travelers with NFT badges and raffle entries for travel credits or free stays.
+- **Tokenized Real Estate Ownership:** Users can invest in fractional property tokens, combining travel with long-term real estate investment.
+- **Cross-Border Simplicity:** With XRPL and Flare, payments are fast, global, and cost only fractions of a cent.
+
+**How we used Flare & XRPL:**
+- **XRPL:** Powers instant payments and token issuance, enabling seamless deposits and property tokenization.
+- **Flare:** Provides smart contract escrow, decentralized oracles for fair raffles and price feeds, and FAssets to bridge XRPL assets into DeFi.
+
+**Impact:**  
+With CryptoCribs, hosts keep more income, travelers pay less, and both sides gain transparency, trust, and ownership opportunities — all powered by blockchain.
+
+---
+
+## Judging Criteria: How CryptoCribs Satisfies the Challenge
+
+- **Fully functional DApp:** Booking, escrow, NFTs, raffles, property tokenization all live on-chain.
+- **Cross-chain:** Uses Flare smart contracts and XRPL for payments, token issuance, and bridging.
+- **Frontend:** Built with React/Next.js, MetaMask (Flare), and GemWallet (XRPL).
+- **Smart contracts:** Foundry for Solidity development, test suite, and deployment.
+- **Transparency:** All logic and payments are auditable and programmatic, reducing trust assumptions.
+- **Innovation:** 20% escrow model, NFT-based loyalty/raffles, and real-world asset tokenization.
+- **Documentation:** Complete with demo video, screenshots, and repo structure walk-through.
+
+*See the Loom video above for a full breakdown of how all criteria are satisfied!*
+
+---
+
+## Architecture
+
+### Tech Stack
+
+- **Frontend:** Next.js 15.x (App Router), TypeScript, Tailwind CSS, React, Lucide Icons, TanStack React Query, Shadcn UI
+- **Blockchain Integrations:** XRPL (via GemWallet), Flare (via MetaMask), FAssets protocol for bridging
+- **Smart Contracts:** Solidity (ERC-20, ERC-721), deployed on Flare
+- **Backend/Oracles:** Flare FTSO/FDC for price feeds & randomness
+- **State Management:** React Context, TanStack React Query
+- **Other:** Sonner for notifications, wagmi for EVM wallet management
+
+---
+
+### High-Level & User Journey Diagrams
+
+#### 1. High-Level Architecture
+
+```mermaid
+flowchart TD
+  subgraph User_Wallets
+    A1["GemWallet / XRPL Funds"]
+    A2["MetaMask / Flare, FXRP"]
+  end
+
+  subgraph XRPL_Layer
+    B1["XRPL Ledger: Payments & Tokens"]
+    B2["XRPL Bridge Account: Locks XRP"]
+    B3["XRPL DEX: Token Swaps"]
+  end
+
+  subgraph Flare_Layer
+    C1["FAssets Bridge: FXRP Mint/Burn"]
+    C2["Flare Smart Contracts: Booking, Escrow, Raffle, NFT"]
+    C3["NFT & Raffle Rewards"]
+    C4["Flare Oracles: FTSO / FDC"]
+  end
+
+  A1 -- "Pay XRP, Hold XRPL tokens" --> B1
+  B1 -- "Send to Bridge" --> B2
+  B2 -- "Lock XRP" --> C1
+  C1 -- "Mint FXRP" --> A2
+  A2 -- "Book/Interact" --> C2
+  C2 -- "Calls Oracles for Data/Randomness" --> C4
+  C2 -- "Mint NFT / Raffle Rewards" --> C3
+  C2 -- "Settle/Release FXRP" --> C1
+  C1 -- "Burn FXRP, unlock XRP" --> B2
+  B2 -- "Release XRP" --> B1
+```
+
+---
+
+#### 2. User Journey Flow
+
+```mermaid
+sequenceDiagram
+  participant Traveler as Traveler (GemWallet, MetaMask)
+  participant Host as Host
+  participant XRPL as XRPL Ledger/DEX
+  participant Flare as Flare Smart Contracts
+  participant Bridge as XRPL-Flare Bridge
+  participant Oracle as Flare Oracles
+
+  Traveler->>XRPL: Holds XRP/Stablecoins (GemWallet)
+  Traveler->>Bridge: Sends XRP to Bridge account
+  Bridge->>Flare: Mints FXRP (FAssets) for Traveler
+  Traveler->>Flare: Uses MetaMask to interact with Booking/Raffle contracts
+  Flare->>Flare: Escrows funds, enforces booking terms, mints NFT tickets
+  Flare->>Oracle: Gets price data, random numbers (raffle)
+  Flare->>Host: Notifies host of booking, holds funds until check-in
+  Flare->>Traveler: Mints NFT rewards/raffle tickets
+  Flare->>Traveler: Releases (refunds or pays out) funds after conditions met
+  Traveler->>Bridge: Burns FXRP to redeem XRP
+  Bridge->>XRPL: Releases XRP back to Traveler/Host
+```
+
+---
+
+#### 3. Component Overview
+
+- **GemWallet (XRPL):** Holds user's XRP and XRPL tokens, signs XRPL transactions.
+- **MetaMask (Flare):** Interacts with Flare smart contracts, holds FXRP and NFTs.
+- **XRPL Bridge:** Locks XRP, issues FXRP on Flare, burns FXRP to unlock XRP.
+- **Smart Contracts (Flare):** Booking escrow, raffle logic, NFT minting.
+- **Oracles (Flare):** Price feeds, randomness for raffles.
+- **NFT Rewards:** Issued as prizes, discounts, or loyalty passes.
+
+---
+
+#### 4. Example User Flow
+
+1. **Traveler connects GemWallet (XRPL) & MetaMask (Flare).**
+2. **Traveler browses listings, selects property.**
+3. **On booking:**
+    - Pays with XRP on XRPL (via GemWallet).
+    - Bridge locks XRP, issues FXRP on Flare.
+    - Traveler approves booking in MetaMask, FXRP held in Flare escrow contract.
+4. **Upon stay/check-in:**
+    - Smart contract releases FXRP to host (minus small fee).
+    - Traveler may receive NFT rewards/raffle ticket.
+5. **If Traveler contributed to daily raffle:**
+    - Receives NFT ticket.
+    - Periodic draw uses on-chain randomness.
+    - Winner(s) get NFT travel rewards.
+6. **If refund/cancellation:**
+    - Smart contract enforces policy and releases funds accordingly.
+7. **All flows are transparent, auditable, and nearly instant.**
+
+---
+
+## Directory Structure
+
+Here's a high-level overview (not all files shown):
+
+```
+.
+├── app/                # Pages & routes (Next.js App Router)
+│   ├── booking/        # Individual booking detail
+│   ├── bookings/       # All bookings dashboard
+│   ├── defi/
+│   ├── host/
+│   ├── properties/
+│   ├── property/
+│   ├── rewards/
+│   └── test-xrpl/
+├── components/         # UI, cards, NFT, staking, modals, etc.
+│   └── ui/             # Design system primitives (buttons, forms, etc)
+├── contracts/          # Solidity contracts, deployment scripts, test
+│   ├── src/
+│   ├── script/
+│   └── test/
+├── hooks/              # React custom hooks (wallets, FDC, fraud, etc)
+├── lib/                # Contract ABIs, network/utils, XRPL clients
+├── public/             # Images, static assets
+│   └── screenshots/    # Put your project screenshots here for README embedding
+├── styles/             # Tailwind and global CSS
+├── README.md
+├── COMPLETE_ARCHITECTURE.md
+├── DEMO_GUIDE.md
+├── DEPLOYMENT.md
+├── INTEGRATION_SUMMARY.md
+├── OPTIMIZATION_REPORT.md
+├── SETUP.md
+├── XRPL_SETUP.md
+└── ...configs, lock files, etc.
+```
+
+---
+
+## Core Implementations
+
+### XRPL Integration
+
+- **XRPLProvider:** React Context provider abstracts connection to XRPL via [GemWallet](https://xrpl.org/blog/2022/gemwallet).
+- **Fast Payments:** Payment flows use XRPL for <5s, low-fee settlement.
+- **Tokenization:** XRPL's issued currencies used for booking vouchers, stablecoins, or asset shares.
+- **DEX Integration:** Built-in DEX enables asset swaps at booking time.
+
+### Flare Network & EVM Smart Contracts
+
+- **MetaMask Integration:** Flare is EVM-compatible; MetaMask is used for all contract interactions (bookings, NFTs, raffles).
+- **Smart Contracts:** All booking logic, escrow, NFT minting, and raffles use Solidity contracts deployed on Flare. Contracts follow OpenZeppelin standards (ERC-20 for FXRP, ERC-721 for NFT rewards).
+- **Oracles:** Flare’s FTSO oracles provide real-time price feeds for dynamic pricing and randomness for raffles.
+
+### Cross-Chain Bridges (FAssets, FXRP)
+
+- **FAssets Protocol:** Used to lock XRP on XRPL and mint FXRP on Flare, enabling seamless cross-chain value transfer.
+- **Bridge Workflow:** Booking payments in XRP are sent to an XRPL bridge (door account), FXRP minted on Flare is used in smart contracts, and can be burned to retrieve XRP later.
+
+### Wallet Integrations (GemWallet, MetaMask)
+
+- **GemWallet:** Handles XRPL transactions and login.
+- **MetaMask:** Used for Flare (EVM) contract calls.
+- **User Flow:** Users connect both wallets, can pay with XRPL assets, and approve contract interactions on Flare.
+
+### Booking, Escrow & Payment Flow
+
+- **Escrow Logic:** Booking payments are held in smart contract escrow on Flare. Funds are only released once check-in conditions are met, or refunded on valid cancellation.
+- **Transparency:** All transactions and rules are on-chain and auditable.
+
+### Raffle & NFT Reward Mechanisms
+
+- **Raffle System:** Users can opt-in daily to a communal raffle pool. Each entry mints an NFT ticket (ERC-721).
+- **Random Draw:** Flare oracles or VRFs are used for provably fair random selection of winners.
+- **NFT Rewards:** Winners and loyal users receive NFT vouchers (e.g., free stays, discounts, exclusive passes) that are tradeable and verifiable on-chain.
+- **Gamification:** NFT passes can be used for loyalty or membership (discounts, exclusive listings, etc.).
+
+---
+
+## Frontend Structure
+
+### Routing & Pages
+
+- **App Router:** All routing handled by Next.js App Router (`app/` directory), using dynamic routes for property detail pages (`/property/[id]`).
+- **Server/Client Components:** Uses `"use client"` in components/pages that require React state/hooks.
+
+### Reusable Components
+
+- **BookingCard:** Handles booking input, date selection, guest count, and initiates booking transaction.
+- **StakingCard:** UI for staking platform tokens or participating in yield pools.
+- **UI Components:** Buttons, badges, separators, etc., are implemented in `/components/ui` using Shadcn UI and Tailwind CSS.
+- **Property Gallery:** Interactive image carousel with indicator and navigation, dynamic badges (Verified, Discount).
+
+### Hooks and Providers
+
+- **useXRPL:** Custom React hook for XRPL wallet connection and transaction handling.
+- **Providers:** `components/providers.tsx` wraps the app with theme, wallet, and state providers (TanStack Query, Wagmi, etc.).
+
+### UI & Styles
+
+- **Design System:** Uses Tailwind CSS for rapid styling, custom themes via Shadcn UI.
+- **Responsive Layout:** Fully responsive grid for listings and details.
+- **Lucide Icons:** Rich icon set for amenities and actions.
+
+---
+
+## Smart Contracts Architecture
+
+All Solidity contracts and deployment scripts reside in the `/contracts` directory.
+
+### Core Components
+
+- **Flare Smart Contracts:** Booking logic, property management, dispute resolution.
+- **XRPL Payments:** Actual payment settlement in XRP.
+- **FDC (Flare Data Connector):** Verifies XRPL transactions on Flare.
+- **FTSOv2:** Provides real-time XRP/USD price feeds.
+
+### How It Works
+
+1. User creates booking on Flare → Gets XRP price via FTSOv2.
+2. User pays in XRP on XRPL → Transaction recorded on XRPL ledger.
+3. FDC verifies XRPL payment → Proves payment occurred on Flare.
+4. Smart contract releases booking → User can access property.
+
+---
+
+## How To Run Locally
+
+1. **Clone the repo**
+   ```sh
+   git clone https://github.com/theonlyhennygod/Crypto-Cribs.git
+   cd Crypto-Cribs
+   ```
+2. **Install dependencies**
+   ```sh
+   npm install
+   ```
+3. **Run the development server**
+   ```sh
+   npm run dev
+   ```
+4. **Open your browser at**
+   ```
+   http://localhost:3000
+   ```
+5. **Connect your wallets**
+   - Install [GemWallet](https://gemwallet.app/) for XRPL.
+   - Add Flare to MetaMask (custom RPC).
+  
+**Make sure to define the environment variables here in your .env file**
+
+```
+# Crypto Cribs Environment Variables
+# Copy this file to .env and fill in your actual values
+
+# =============================================================================
+# FRONTEND ENVIRONMENT VARIABLES
+# =============================================================================
+
+# Smart Contract Addresses (Deploy contracts first, then update these)
+NEXT_PUBLIC_BOOKING_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+NEXT_PUBLIC_XRPL_BRIDGE_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+
+# WalletConnect Configuration
+# Get your project ID from https://cloud.walletconnect.com/
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id_here
+
+# Application URLs (for production deployment)
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+NEXT_PUBLIC_APP_NAME=Crypto Cribs
+
+# =============================================================================
+# SMART CONTRACT DEPLOYMENT (contracts/.env)
+# =============================================================================
+
+# Private key for contract deployment (WITHOUT 0x prefix)
+# ⚠️  NEVER commit this to version control!
+PRIVATE_KEY=your_private_key_without_0x_prefix
+
+# RPC URLs for different networks
+RPC_URL_COSTON2=https://coston2-api.flare.network/ext/C/rpc
+RPC_URL_FLARE=https://flare-api.flare.network/ext/C/rpc
+
+# Block Explorer API Keys for contract verification
+FLARESCAN_API_KEY=your_flarescan_api_key
+
+# Deployed contract addresses (update after deployment)
+BOOKING_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+PROPERTY_NFT_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+PROPERTY_ESCROW_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+XRPL_BRIDGE_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+
+# Development mode (affects XRPL network selection)
+NODE_ENV=development
+
+# =============================================================================
+# SETUP INSTRUCTIONS
+# =============================================================================
+
+# 1. Frontend Setup:
+#    - Copy this file to .env
+#    - Get WalletConnect Project ID from https://cloud.walletconnect.com/
+#    - Deploy contracts first, then update contract addresses
+
+# 2. Smart Contract Setup:
+#    - Copy this file to contracts/.env
+#    - Add your private key (get testnet FLR from https://faucet.flare.network/coston2)
+#    - Run: cd contracts && make deploy-coston2
+#    - Update contract addresses in both .env files
+
+# 3. Network Information:
+#    - Coston2 Testnet Chain ID: 114
+#    - Flare Mainnet Chain ID: 14
+#    - XRPL Testnet: wss://s.altnet.rippletest.net:51233
+#    - XRPL Mainnet: wss://xrplcluster.com
+
+# 4. Faucets:
+#    - Coston2 FLR: https://faucet.flare.network/coston2
+#    - XRPL Testnet: https://xrpl.org/xrp-testnet-faucet.html
+
+```
+---
+
+## How To Deploy
+
+1. **Build the project**
+   ```sh
+   npm run build
+   ```
+2. **Start the production server**
+   ```sh
+   npm run start
+   ```
+3. **Or deploy to Vercel/Netlify/your cloud provider**  
+   (Configure your environment variables and wallet integrations as needed.)
+
+---
+
+## Security & Compliance
+
+- **Smart Contract Audits:** All Solidity contracts should be audited before mainnet deployment.
+- **Wallet Security:** Users are responsible for their wallet keys; platform enforces non-custodial model.
+- **Compliance:** Optional KYC via XRPL Hooks or sidechains. All token issuance uses XRPL's compliance primitives (freeze, clawback, etc.).
+- **Oracle Manipulation:** FTSOv2 uses multiple data sources to prevent price manipulation.
+- **Reentrancy Protection:** All state-changing functions protected using OpenZeppelin’s ReentrancyGuard.
+- **Access Control:** Proper role-based permissions and emergency pause controls.
+
+---
+
+## Planned Improvements
+
+- **API Integration:** Move from mock property data to decentralized storage (IPFS or off-chain DB).
+- **XRPL EVM Sidechain:** Migrate smart contracts to XRPL EVM sidechain for even closer integration.
+- **Mobile UI:** Responsive enhancements and native app wrappers.
+- **DAO Governance:** On-chain governance of platform fees, raffle frequency, etc.
+- **More DeFi Integrations:** Staking, yield farming, and liquidity mining for property/token holders.
+
+---
+
+## References & Sources
+
+- [XRPL Real Estate Tokenization](https://www.antiersolutions.com/blogs/xrpl-in-real-estate-tokenization-key-2025-trends-and-why-its-time-to-build-your-platform/)
+- [GemWallet Developer Docs](https://xrpl.org/blog/2022/gemwallet)
+- [Flare Network Docs](https://flare.network/)
+- [Flare & XRPL Strategic Alliance](https://www.okx.com/en-us/learn/flare-xrpl-crypto-defi-tokenization)
+- [Blockchain Raffle System](https://techaroha.com/blockchain-powered-raffle-lottery-system/)
+- [WEPIN Web3 Travel Blog](https://www.wepin.io/en/blog/web3-travel-revolution)
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/)
+- [Shadcn UI](https://ui.shadcn.com/)
+- [TanStack React Query](https://tanstack.com/query/v4)
+- [Flare Documentation](https://dev.flare.network/)
+- [XRPL Documentation](https://xrpl.org/docs.html)
+- [Foundry Book](https://book.getfoundry.sh/)
