@@ -18,18 +18,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Search,
+  Filter,
+  Grid3X3,
   Grid,
   List,
-  Search,
-  MapPin,
-  Calendar,
-  Users,
-  Filter,
-  SlidersHorizontal,
-  ArrowUpDown,
-  ChevronDown,
   Star,
+  MapPin,
+  Users,
+  Bed,
+  Bath,
+  Wifi,
+  Car,
+  Coffee,
+  Dumbbell,
+  Shield,
+  Heart,
+  Share,
+  ChevronDown,
+  SlidersHorizontal,
   Coins,
+  Zap,
 } from "lucide-react";
 
 // Complete mock property data - 18 properties
@@ -52,8 +61,9 @@ const mockProperties = [
       "/villa-bedroom-luxury.jpg",
     ],
     amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Air conditioning"],
+    propertyType: "Villa",
     host: "Sarah Chen",
-    hostWallet: "0x1234567890abcdef1234567890abcdef12345678",
+    hostWallet: "rSarahChenXRPLWallet123456789abcdef",
     isVerified: true,
     discount: 30,
     instantBook: true,
@@ -64,7 +74,7 @@ const mockProperties = [
     location: "Tokyo, Japan",
     price: 180,
     originalPrice: 280,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.7,
     reviews: 89,
     guests: 4,
@@ -76,8 +86,9 @@ const mockProperties = [
       "/tokyo-skyline-view.jpg",
     ],
     amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning"],
+    propertyType: "Loft",
     host: "Kenji Tanaka",
-    hostWallet: "0x2345678901bcdef1234567890abcdef12345679",
+    hostWallet: "rKenjiTanakaXRPLWallet123456789abcdef",
     isVerified: true,
     discount: 35,
     instantBook: false,
@@ -99,9 +110,10 @@ const mockProperties = [
       "/cabin-hot-tub-mountains.jpg",
       "/cozy-cabin-interior.png",
     ],
-    amenities: ["WiFi", "Kitchen", "Heating", "Hot Tub"],
+    amenities: ["WiFi", "Fireplace", "Kitchen", "Parking"],
+    propertyType: "Cabin",
     host: "Hans Mueller",
-    hostWallet: "0x3456789012cdef1234567890abcdef1234567a",
+    hostWallet: "rHansMuellerXRPLWallet123456789abcdef",
     isVerified: true,
     discount: 33,
     instantBook: true,
@@ -112,7 +124,7 @@ const mockProperties = [
     location: "Barcelona, Spain",
     price: 95,
     originalPrice: 140,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.6,
     reviews: 203,
     guests: 2,
@@ -124,6 +136,7 @@ const mockProperties = [
       "/historic-district-barcelona.jpg",
     ],
     amenities: ["WiFi", "Kitchen", "Air conditioning"],
+    propertyType: "Studio",
     host: "Maria Rodriguez",
     hostWallet: "0x456789013def1234567890abcdef1234567ab",
     isVerified: false,
@@ -155,6 +168,7 @@ const mockProperties = [
       "Gym",
       "Air conditioning",
     ],
+    propertyType: "Penthouse",
     host: "David Johnson",
     hostWallet: "0x56789014ef1234567890abcdef1234567abc",
     isVerified: true,
@@ -167,7 +181,7 @@ const mockProperties = [
     location: "Kyoto, Japan",
     price: 240,
     originalPrice: 350,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.8,
     reviews: 134,
     guests: 4,
@@ -179,6 +193,7 @@ const mockProperties = [
       "/traditional-japanese-room.jpg",
     ],
     amenities: ["WiFi", "Kitchen", "Garden", "Traditional Bath"],
+    propertyType: "House",
     host: "Yuki Sato",
     hostWallet: "0x6789015f1234567890abcdef1234567abcd",
     isVerified: true,
@@ -199,6 +214,7 @@ const mockProperties = [
     bathrooms: 3,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Air conditioning"],
+    propertyType: "Villa",
     host: "Ahmed Al-Mansouri",
     hostWallet: "0x789016f1234567890abcdef1234567abcde",
     isVerified: true,
@@ -211,7 +227,7 @@ const mockProperties = [
     location: "Cotswolds, UK",
     price: 160,
     originalPrice: 220,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.5,
     reviews: 167,
     guests: 4,
@@ -219,6 +235,7 @@ const mockProperties = [
     bathrooms: 1,
     images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994"], // image of a house
     amenities: ["WiFi", "Kitchen", "Garden", "Fireplace"],
+    propertyType: "Cottage",
     host: "Emma Thompson",
     hostWallet: "0x89017f1234567890abcdef1234567abcdef",
     isVerified: true,
@@ -239,6 +256,7 @@ const mockProperties = [
     bathrooms: 2,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Kitchen", "Heating", "Sauna"],
+    propertyType: "Cabin",
     host: "Erik Lindqvist",
     hostWallet: "0x90128f1234567890abcdef1234567abcdef0",
     isVerified: true,
@@ -251,7 +269,7 @@ const mockProperties = [
     location: "Marrakech, Morocco",
     price: 140,
     originalPrice: 200,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.4,
     reviews: 98,
     guests: 8,
@@ -259,6 +277,7 @@ const mockProperties = [
     bathrooms: 2,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Kitchen", "Air conditioning", "Terrace"],
+    propertyType: "Riad",
     host: "Amina Benali",
     hostWallet: "0xa1239f1234567890abcdef1234567abcdef01",
     isVerified: true,
@@ -279,6 +298,7 @@ const mockProperties = [
     bathrooms: 2,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Kitchen", "Air conditioning", "Stargazing"],
+    propertyType: "Lodge",
     host: "Jack Thompson",
     hostWallet: "0xb234af1234567890abcdef1234567abcdef02",
     isVerified: true,
@@ -291,7 +311,7 @@ const mockProperties = [
     location: "Tuscany, Italy",
     price: 420,
     originalPrice: 600,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.9,
     reviews: 145,
     guests: 8,
@@ -301,6 +321,7 @@ const mockProperties = [
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae"
     ],
     amenities: ["WiFi", "Pool", "Kitchen", "Garden", "Wine Cellar"],
+    propertyType: "Villa",
     host: "Giuseppe Rossi",
     hostWallet: "0xc345bf1234567890abcdef1234567abcdef03",
     isVerified: true,
@@ -321,6 +342,7 @@ const mockProperties = [
     bathrooms: 1,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Heating", "Northern Lights View"],
+    propertyType: "Cabin",
     host: "Björk Sigurdsson",
     hostWallet: "0xd456cf1234567890abcdef1234567abcdef04",
     isVerified: true,
@@ -333,7 +355,7 @@ const mockProperties = [
     location: "Ubud, Bali",
     price: 180,
     originalPrice: 250,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.6,
     reviews: 123,
     guests: 4,
@@ -341,6 +363,7 @@ const mockProperties = [
     bathrooms: 1,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Kitchen", "Garden", "Yoga Platform"],
+    propertyType: "Treehouse",
     host: "Made Wijaya",
     hostWallet: "0xe567df1234567890abcdef1234567abcdef05",
     isVerified: true,
@@ -362,6 +385,7 @@ const mockProperties = [
     images: [
       "https://images.unsplash.com/photo-1506744038136-46273834b3fb"],
     amenities: ["WiFi", "Kitchen", "Heating", "Fireplace", "Ski Access"],
+    propertyType: "Chalet",
     host: "Sarah MacDonald",
     hostWallet: "0xf678ef1234567890abcdef1234567abcdef06",
     isVerified: true,
@@ -374,7 +398,7 @@ const mockProperties = [
     location: "Santorini, Greece",
     price: 480,
     originalPrice: 680,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.9,
     reviews: 201,
     guests: 6,
@@ -382,6 +406,7 @@ const mockProperties = [
     bathrooms: 2,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Pool", "Kitchen", "Sea View"],
+    propertyType: "Villa",
     host: "Dimitris Papadopoulos",
     hostWallet: "0x0789ff1234567890abcdef1234567abcdef07",
     isVerified: true,
@@ -402,7 +427,8 @@ const mockProperties = [
     bathrooms: 1,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Kitchen", "Heating", "Lake View"],
-    host: "Emma Wilson",
+    propertyType: "Cabin",
+    host: "James Wilson",
     hostWallet: "0x189a0f1234567890abcdef1234567abcdef08",
     isVerified: true,
     discount: 29,
@@ -414,7 +440,7 @@ const mockProperties = [
     location: "Rio de Janeiro, Brazil",
     price: 320,
     originalPrice: 450,
-    currency: "FLR" as const,
+    currency: "XRP" as const,
     rating: 4.5,
     reviews: 156,
     guests: 8,
@@ -422,6 +448,7 @@ const mockProperties = [
     bathrooms: 3,
     images: ["/loft-interior-modern.jpg", "/loft-interior-modern.jpg", "/loft-interior-modern.jpg"],
     amenities: ["WiFi", "Pool", "Kitchen", "Beach Access"],
+    propertyType: "House",
     host: "Carlos Silva",
     hostWallet: "0x29ab1f1234567890abcdef1234567abcdef09",
     isVerified: true,
@@ -571,15 +598,39 @@ export default function PropertiesPage() {
               >
                 Property Listings
               </Badge>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
-                Discover Amazing
-                <br />
-                <span className="text-primary">Places to Stay</span>
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
-                Browse verified properties with transparent pricing and save up
-                to 50% compared to traditional booking platforms.
-              </p>
+              <div className="text-center mb-8">
+                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                  Discover Amazing Places
+                </h1>
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
+                  Book unique accommodations worldwide with cryptocurrency. Secure,
+                  decentralized, and seamless travel experiences.
+                </p>
+                
+                {/* Architecture Explanation */}
+                <div className="max-w-4xl mx-auto mb-8">
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Coins className="h-4 w-4 text-blue-600" />
+                        <span className="font-semibold text-blue-800">XRPL Payment Layer</span>
+                      </div>
+                      <p className="text-blue-700">
+                        Direct XRP payments • Fast settlements • Low fees • Global reach
+                      </p>
+                    </div>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Zap className="h-4 w-4 text-orange-600" />
+                        <span className="font-semibold text-orange-800">Flare DeFi Layer</span>
+                      </div>
+                      <p className="text-orange-700">
+                        Smart contracts • Staking rewards • Cross-chain verification • FTSOv2 oracles
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>  
             </motion.div>
           </div>
         </div>

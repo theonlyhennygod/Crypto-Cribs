@@ -1,5 +1,5 @@
 {
-  "name": "my-v0-project",
+  "name": "CryptoCribs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -47,6 +47,7 @@
     "@radix-ui/react-tooltip": "1.1.6",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@tanstack/react-query": "^5.62.7",
+    "@types/ws": "^8.18.1",
     "@vercel/analytics": "latest",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
@@ -73,6 +74,7 @@
     "vaul": "latest",
     "viem": "^2.21.51",
     "wagmi": "^2.13.10",
+    "ws": "^8.18.3",
     "xrpl": "^3.0.0",
     "zod": "3.25.67"
   },

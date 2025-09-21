@@ -8,10 +8,9 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Crypto Cribs - Your Gateway to Luxury Stays with Crypto",
+  title: "Crypto Cribs - Decentralized Travel Platform",
   description:
-    "Book your next luxury stay with cryptocurrency. Enjoy transparent fees, cross-chain payments, and exclusive rewards.",
-  generator: "v0.app",
+    "Revolutionary travel booking platform with XRPL & Flare Network integration. Experience seamless cross-chain payments and DeFi features.",
   icons: {
     icon: "/cryptocribs.png",
     shortcut: "/cryptocribs.png",

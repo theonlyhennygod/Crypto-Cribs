@@ -115,7 +115,7 @@ export function useBookingWrite() {
       ...contract,
       functionName: "listProperty",
       args: [name, location, pricePerNightUSD, amenities, maxGuests],
-      value: options?.value || parseEther("0.1"), // Default verification fee
+      value: options?.value ?? parseEther("0.1"), // Default verification fee
     });
   };
 

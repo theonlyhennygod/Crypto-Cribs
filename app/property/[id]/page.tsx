@@ -20,6 +20,8 @@ import {
 import { useState, useEffect } from "react";
 import { BookingCard } from "@/components/booking-card";
 import { StakingCard } from "@/components/staking-card";
+import { WalletStatus } from "@/components/wallet-status";
+import { useWallet } from "@/hooks/use-wallet";
 import { useRouter } from "next/navigation";
 
 // Mock property data - in real app this would come from API
@@ -53,7 +55,7 @@ const mockProperties = [
       "Hot Tub",
     ],
     host: "Sarah Chen",
-    hostWallet: "0x1234567890abcdef1234567890abcdef12345678",
+    hostWallet: "rDemoHostWallet123456789abcdef",
     isVerified: true,
     discount: 30,
     description:
@@ -669,7 +671,15 @@ export default function PropertyDetailPage({
     params.then((p) => setId(p.id));
   }, [params]);
 
-  // Find the property by ID - in real app this would be an API call
+  // Wallet integration
+  const { 
+    metamaskConnected, 
+    gemConnected, 
+    activeWallet, 
+    metamaskBalance, 
+    gemBalance 
+  } = useWallet();
+
   const property = mockProperties.find((p) => p.id === id) || mockProperties[0];
   const savings = property.originalPrice - property.price;
 
@@ -693,7 +703,7 @@ export default function PropertyDetailPage({
               <ChevronLeft className="h-4 w-4 mr-2" />
               Back to listings
             </Button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm">
                 <Share className="h-4 w-4 mr-2" />
                 Share
@@ -710,6 +720,9 @@ export default function PropertyDetailPage({
                 />
                 Save
               </Button>
+              
+              {/* Wallet Connect Button */}
+              <WalletStatus />
             </div>
           </div>
         </div>
@@ -856,6 +869,87 @@ export default function PropertyDetailPage({
 
           {/* Booking Sidebar */}
           <div className="space-y-6">
+            {/* Wallet Connection Status */}
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                Wallet Status
+              </h3>
+              
+              {!metamaskConnected && !gemConnected ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Connect your wallets to book this property with crypto payments
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">M</span>
+                        </div>
+                        <span className="text-sm">MetaMask (Flare)</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs">Not Connected</Badge>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">G</span>
+                        </div>
+                        <span className="text-sm">GemWallet (XRPL)</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs">Not Connected</Badge>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm text-green-600 font-medium">
+                    ✅ Wallets connected! Ready to book with crypto.
+                  </p>
+                  <div className="space-y-2">
+                    {metamaskConnected && (
+                      <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">M</span>
+                          </div>
+                          <span className="text-sm">MetaMask</span>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="default" className="text-xs bg-green-600">Connected</Badge>
+                          {metamaskBalance && (
+                            <p className="text-xs text-muted-foreground mt-1">{metamaskBalance} C2FLR</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {gemConnected && (
+                      <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">G</span>
+                          </div>
+                          <span className="text-sm">GemWallet</span>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="default" className="text-xs bg-blue-600">Connected</Badge>
+                          {gemBalance && (
+                            <p className="text-xs text-muted-foreground mt-1">{gemBalance} XRP</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {activeWallet && (
+                    <p className="text-xs text-muted-foreground">
+                      Active: {activeWallet === "metamask" ? "MetaMask (Flare)" : "GemWallet (XRPL)"}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+            
             <BookingCard property={property} />
             <StakingCard />
           </div>

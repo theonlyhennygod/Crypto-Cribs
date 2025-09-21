@@ -133,8 +133,6 @@ export function XRPLProvider({ children }: { children: ReactNode }) {
 
       console.log("Wallet created:", wallet.address);
       console.log("Wallet seed (SAVE THIS!):", wallet.seed);
-
-      return wallet;
     } catch (error: any) {
       setState((prev) => ({
         ...prev,
@@ -182,7 +180,7 @@ export function XRPLProvider({ children }: { children: ReactNode }) {
 
       setState((prev) => ({
         ...prev,
-        balance: dropsToXrp(response.wallet.balance),
+        balance: dropsToXrp(response.balance),
       }));
 
       console.log("Wallet funded with 1000 XRP from testnet faucet");
@@ -328,7 +326,7 @@ export function XRPLProvider({ children }: { children: ReactNode }) {
               : undefined,
             timestamp: (tx.tx.date || 0) * 1000,
             status:
-              tx.meta?.TransactionResult === "tesSUCCESS"
+              (tx.meta && typeof tx.meta === 'object' && 'TransactionResult' in tx.meta && tx.meta.TransactionResult === "tesSUCCESS")
                 ? "validated"
                 : "failed",
           };

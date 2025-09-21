@@ -40,7 +40,7 @@ if (typeof window !== "undefined") {
             console.log("  🔍 Response.result:", response?.result);
             console.log(
               "  ✅ GemWallet installed:",
-              response?.result === true || response === true
+              response?.result?.isInstalled === true || response?.result === true || response === true
             );
           })
           .catch((e) => {

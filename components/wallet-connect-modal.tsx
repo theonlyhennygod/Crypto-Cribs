@@ -52,7 +52,14 @@ export function WalletConnectModal({
         // Wait a bit for extensions to load, then check GemWallet
         setTimeout(async () => {
           try {
-            const gemWalletInstalled = await isInstalled();
+            // Add timeout to prevent hanging requests
+            const gemWalletInstalled = await Promise.race([
+              isInstalled(),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Detection timeout')), 2000)
+              )
+            ]);
+            
             console.log(
               "💎 GemWallet API Detection Result:",
               gemWalletInstalled
@@ -66,22 +73,10 @@ export function WalletConnectModal({
                 "❌ GemWallet not found - please install from https://gemwallet.app/"
               );
             }
-          } catch (error) {
-            console.log("⚠️ Error checking GemWallet:", error);
-            // Try again after a longer delay
-            setTimeout(async () => {
-              try {
-                const retryResult = await isInstalled();
-                setGemWalletAvailable(retryResult);
-                console.log("🔄 Retry GemWallet detection:", retryResult);
-              } catch (retryError) {
-                console.log(
-                  "❌ GemWallet detection failed after retry:",
-                  retryError
-                );
-                setGemWalletAvailable(false);
-              }
-            }, 2000);
+          } catch (error: any) {
+            console.log("⚠️ GemWallet detection skipped:", error.message);
+            setGemWalletAvailable(false);
+            // Don't retry to avoid RPC spam
           }
         }, 500);
 
@@ -100,6 +95,10 @@ export function WalletConnectModal({
   const handleMetaMaskConnect = async () => {
     clearError();
     try {
+      console.log("🔗 Connecting MetaMask from modal...", {
+        page: window.location.pathname,
+        timestamp: new Date().toISOString()
+      });
       await connectMetaMask();
     } catch (err: any) {
       // Error is handled in the hook, but we can add UI feedback here
@@ -110,6 +109,10 @@ export function WalletConnectModal({
   const handleGemWalletConnect = async () => {
     clearError();
     try {
+      console.log("💎 Connecting GemWallet from modal...", {
+        page: window.location.pathname,
+        timestamp: new Date().toISOString()
+      });
       // Just call the hook - it now handles all the retry logic and proper API usage
       await connectGemWallet();
     } catch (err: any) {

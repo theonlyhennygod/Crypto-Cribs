@@ -15,12 +15,7 @@ export const XRPL_NETWORKS = {
     explorer: "https://devnet.xrpl.org",
     chainId: "devnet",
   },
-  mainnet: {
-    name: "XRPL Mainnet",
-    server: "wss://xrplcluster.com",
-    explorer: "https://xrpl.org",
-    chainId: "mainnet",
-  },
+  // Note: Mainnet configuration removed for testnet-only deployment
 } as const
 
 export const FLARE_NETWORKS = {
@@ -36,9 +31,9 @@ export const FLARE_NETWORKS = {
       decimals: 18,
     },
     contracts: {
-      ftsoV2: "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
-      stateConnector: "0x0c13aDA1C7143Cf0a0795FFaB93eEBb6FAD6e4e3",
-      fdcAttestationClient: "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
+      ftsoV2: "0x58f7Df645525c08C4d8f86E0d3E1b9E1B18C5C8a", // Mainnet address
+      stateConnector: "0x3F5027dFC6B8d62bbC3E851c4a07B9E5f0123456", // Mainnet address
+      fdcAttestationClient: "0x7e4B5e4D9f8C1a2B3C4D5E6F7a8B9C0d1E2F3a4B", // Mainnet address
     },
   },
   flare: {
@@ -52,14 +47,14 @@ export const FLARE_NETWORKS = {
       decimals: 18,
     },
     contracts: {
-      ftsoV2: "0x58f7Df645525c08C4d8f86E0d3E1b9E1B18C5C8a", // Mainnet address
-      stateConnector: "0x3F5027dFC6B8d62bbC3E851c4a07B9E5f0123456", // Mainnet address
-      fdcAttestationClient: "0x7e4B5e4D9f8C1a2B3C4D5E6F7a8B9C0d1E2F3a4B", // Mainnet address
+      ftsoV2: "0xC4e9c78EA53db782E28f28Fdf80BaF59336B304d",
+      stateConnector: "0x0c13aDA1C7143Cf0a0795FFaB93eEBb6FAD6e4e3",
+      fdcAttestationClient: "0xA90Db6D10F856799b10ef2A77EBCbF460aC71e52",
     },
   },
 } as const
 
-// Current network configuration (testnet for development)
+// Current network configuration (testnet only for development)
 export const CURRENT_XRPL_NETWORK = XRPL_NETWORKS.testnet
 export const CURRENT_FLARE_NETWORK = FLARE_NETWORKS.coston2
 

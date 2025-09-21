@@ -27,8 +27,18 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
+        ws: false, // Add WebSocket fallback for client-side
       };
     }
+
+    // Handle WebSocket module resolution
+    config.externals = config.externals || [];
+    if (!isServer) {
+      config.externals.push({
+        ws: 'ws',
+      });
+    }
+
     return config;
   },
 
@@ -39,16 +49,21 @@ const nextConfig = {
         source: "/(.*)",
         headers: [
           {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
             key: "X-Frame-Options",
             value: "DENY",
           },
           {
             key: "X-XSS-Protection",
             value: "1; mode=block",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/css/(.*)",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/css",
           },
         ],
       },

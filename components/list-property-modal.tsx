@@ -79,12 +79,16 @@ interface AntifraudCheck {
   required: boolean;
 }
 
-export function ListPropertyModal({ children }: { children: React.ReactNode }) {
+interface ListPropertyModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function ListPropertyModal({ open, onOpenChange }: ListPropertyModalProps) {
   const { isConnected, walletAddress } = useWallet();
   const { address, chainId } = useAccount();
   const { listProperty, hash, isPending, isConfirming, isSuccess, error } =
     useBookingWrite();
-  const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ListingFormData>({
@@ -337,7 +341,7 @@ export function ListPropertyModal({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (isSuccess) {
       toast.success("Property listed successfully on the blockchain!");
-      setOpen(false);
+      onOpenChange(false);
       setStep(1);
       // Reset form
       setFormData({
@@ -372,8 +376,7 @@ export function ListPropertyModal({ children }: { children: React.ReactNode }) {
     .every((c) => c.status === "passed");
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -841,7 +844,7 @@ export function ListPropertyModal({ children }: { children: React.ReactNode }) {
 
               <div className="flex justify-center">
                 <Button
-                  onClick={() => setOpen(false)}
+                  onClick={() => onOpenChange(false)}
                   disabled={!allChecksPassed}
                   className="px-8"
                 >

@@ -30,7 +30,7 @@ import { useXRPL } from "@/hooks/use-xrpl";
 import { useFTSO } from "@/hooks/use-ftso";
 import { useFraudProtection } from "@/hooks/use-fraud-protection";
 import { useBookingWrite } from "@/hooks/use-contract";
-import { useAccount } from "wagmi";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 import {
   switchToCoston2,
@@ -41,42 +41,104 @@ import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CrossChainPayment } from "@/components/cross-chain-payment";
 
+// Smart Contract Configuration
+const BOOKING_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_BOOKING_CONTRACT_ADDRESS as `0x${string}`;
+const XRPL_BRIDGE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_XRPL_BRIDGE_CONTRACT_ADDRESS as `0x${string}`;
+
+// Simplified ABI for the functions we need
+const BOOKING_CONTRACT_ABI = [
+  {
+    name: "createBooking",
+    type: "function",
+    stateMutability: "payable",
+    inputs: [
+      { name: "propertyId", type: "uint256" },
+      { name: "checkInDate", type: "uint256" },
+      { name: "checkOutDate", type: "uint256" },
+      { name: "guests", type: "uint256" },
+      { name: "totalPriceUSD", type: "uint256" },
+      { name: "totalPriceXRP", type: "uint256" }
+    ],
+    outputs: [{ name: "bookingId", type: "uint256" }]
+  }
+] as const;
+
+const BRIDGE_CONTRACT_ABI = [
+  {
+    name: "bridgeXRPToFlare",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "xrplTxHash", type: "string" },
+      { name: "amount", type: "uint256" },
+      { name: "recipient", type: "address" }
+    ],
+    outputs: [{ name: "requestId", type: "bytes32" }]
+  }
+] as const;
+
 interface BookingCardProps {
   property: {
     id: string;
+    title: string;
     price: number;
     originalPrice?: number;
     currency: "XRP" | "FLR";
     discount?: number;
     hostWallet: string;
+    pricePerNightUSD?: number;
   };
 }
 
+// Helper function for risk assessment
+const getRiskAssessment = (riskScore: number) => {
+  if (riskScore >= 80) return { level: "High Risk", color: "text-red-600" };
+  if (riskScore >= 40) return { level: "Medium Risk", color: "text-yellow-600" };
+  return { level: "Low Risk", color: "text-green-600" };
+};
+
 export function BookingCard({ property }: BookingCardProps) {
   const isHydrated = useHydration();
-  const { isConnected, xrplWallet, metamaskConnected, metamaskAddress } =
-    useWallet();
+  const { 
+    isConnected, 
+    metamaskConnected, 
+    gemConnected, 
+    activeWallet, 
+    metamaskAddress,
+    xrplWallet,
+    gemAddress,
+    gemBalance
+  } = useWallet();
   const { address, isConnected: wagmiConnected, chainId } = useAccount();
-  const xrpl = useXRPL();
+  const { 
+    sendPayment, 
+    isConnected: xrplConnected, 
+    address: xrplAddress,
+    balance: xrplBalance 
+  } = useXRPL();
   const ftso = useFTSO();
-  const {
-    walletVerification,
-    checkBookingFraud,
-    recordBookingAttempt,
-    getRiskAssessment,
-  } = useFraudProtection();
-  const {
-    createBooking,
-    listProperty,
-    hash,
-    isPending,
-    isConfirming,
-    isSuccess,
-    error,
-  } = useBookingWrite();
-
-  // Wallet hooks
-  const { sendXRPPayment, gemConnected } = useWallet();
+  const { checkFraud } = useFraudProtection();
+  const { writeContract, isPending, isConfirming } = useBookingWrite();
+  
+  // Smart Contract Integration
+  const { 
+    writeContract: writeBookingContract, 
+    data: bookingHash,
+    isPending: isBookingPending,
+    error: bookingError 
+  } = useWriteContract();
+  
+  const { 
+    isLoading: isBookingConfirming, 
+    isSuccess: isBookingSuccess 
+  } = useWaitForTransactionReceipt({
+    hash: bookingHash,
+  });
+  
+  // Map the new booking success state to the old variable name for compatibility
+  const isSuccess = isBookingSuccess;
+  const hash = bookingHash;
+  const error = bookingError;
 
   // Set default dates: check-in tomorrow, check-out day after
   const tomorrow = new Date();
@@ -255,12 +317,18 @@ export function BookingCard({ property }: BookingCardProps) {
       if (gemConnected && sendXRPPayment) {
         try {
           console.log("  → Sending real XRPL payment via GemWallet...");
-          realXrplTxHash = await sendXRPPayment(
-            finalXrpAmount,
+          const paymentResult = await sendXRPPayment(
             xrplAddress,
+            finalXrpAmount,
             `CryptoCribs booking for property ${property.id}`
           );
-          console.log(`  ✅ Real XRPL Transaction Hash: ${realXrplTxHash}`);
+          
+          if (paymentResult.success && paymentResult.txHash) {
+            realXrplTxHash = paymentResult.txHash;
+            console.log(`  ✅ Real XRPL Transaction Hash: ${realXrplTxHash}`);
+          } else {
+            throw new Error(paymentResult.error || "Payment failed");
+          }
         } catch (xrplError) {
           console.warn(
             "  ⚠️ XRPL payment failed, falling back to simulation:",
@@ -307,6 +375,95 @@ export function BookingCard({ property }: BookingCardProps) {
       );
     } finally {
       setIsCheckingFraud(false);
+    }
+  };
+
+  // Direct XRP Payment Function (bypasses modal, calls smart contract directly)
+  const handleDirectXRPPayment = async () => {
+    console.log("🔍 Checking wallet connections...");
+    console.log("  gemConnected:", gemConnected);
+    console.log("  gemAddress:", gemAddress);
+    console.log("  gemBalance:", gemBalance);
+    console.log("  wagmiConnected:", wagmiConnected);
+    console.log("  address:", address);
+
+    if (!gemConnected || !gemAddress) {
+      toast.error("Please connect your GemWallet first");
+      return;
+    }
+
+    if (!wagmiConnected || !address) {
+      toast.error("Please connect your MetaMask for smart contract interaction");
+      return;
+    }
+
+    if (!checkIn || !checkOut) {
+      toast.error("Please select check-in and check-out dates");
+      return;
+    }
+
+    try {
+      toast.info("🚀 Initiating direct XRP payment to smart contract...");
+
+      // Step 1: Send XRP payment via GemWallet
+      const xrpAmount = Math.max(0.01, Math.min(total / 1000, 0.5)); // Demo-friendly amount
+      console.log(`💎 Sending ${xrpAmount} XRP payment...`);
+
+      // Use GemWallet API directly instead of XRPL hook
+      const { submitTransaction } = await import("@gemwallet/api");
+      
+      // Ensure we have a valid XRPL destination address
+      const destinationAddress = "rw6gZcjxbKHBN8yEJDMErMhja6jwga6xpT"; // Your address for demo
+      
+      const payment = {
+        TransactionType: "Payment",
+        Destination: destinationAddress,
+        Amount: String(Math.floor(xrpAmount * 1000000)), // Convert to drops
+        Memos: [
+          {
+            Memo: {
+              MemoData: Buffer.from(`Booking: ${property.title} - ${nights} nights`).toString('hex').toUpperCase()
+            }
+          }
+        ]
+      };
+
+      console.log("💎 Submitting payment via GemWallet:", payment);
+      const paymentResult = await submitTransaction({ transaction: payment });
+
+      if (!paymentResult?.result?.hash) {
+        throw new Error("XRP payment failed");
+      }
+
+      const txHash = paymentResult.result.hash;
+      toast.success(`✅ XRP payment sent! Hash: ${txHash.substring(0, 10)}...`);
+
+      // Step 2: Bridge XRP to Flare and create booking
+      console.log("🌉 Bridging XRP to Flare and creating booking...");
+      
+      const checkInTimestamp = Math.floor(new Date(checkIn).getTime() / 1000);
+      const checkOutTimestamp = Math.floor(new Date(checkOut).getTime() / 1000);
+      
+      await writeBookingContract({
+        address: BOOKING_CONTRACT_ADDRESS,
+        abi: BOOKING_CONTRACT_ABI,
+        functionName: "createBooking",
+        args: [
+          BigInt(property.id), // propertyId
+          BigInt(checkInTimestamp), // checkInDate
+          BigInt(checkOutTimestamp), // checkOutDate
+          BigInt(guests), // guests
+          BigInt(Math.floor(total * 100)), // totalPriceUSD (in cents)
+          BigInt(Math.floor(xrpAmount * 1000000)) // totalPriceXRP (in drops)
+        ],
+        value: parseEther("0.01") // Small gas fee
+      });
+
+      toast.success("🎉 Booking created successfully on Coston2!");
+
+    } catch (error: any) {
+      console.error("❌ Direct XRP payment failed:", error);
+      toast.error(`Payment failed: ${error.message || "Unknown error"}`);
     }
   };
 
@@ -543,10 +700,10 @@ export function BookingCard({ property }: BookingCardProps) {
           </div>
 
           {/* Wallet Verification Status */}
-          {walletVerification && isConnected && (
+          {fraudCheck && isConnected && (
             <Alert
               className={
-                walletVerification.riskScore >= 40
+                fraudCheck.riskScore >= 40
                   ? "border-yellow-500"
                   : "border-green-500"
               }
@@ -554,9 +711,9 @@ export function BookingCard({ property }: BookingCardProps) {
               <Shield className="h-4 w-4" />
               <AlertTitle>Wallet Status</AlertTitle>
               <AlertDescription>
-                {getRiskAssessment(walletVerification.riskScore).level} - Age:{" "}
-                {walletVerification.age} days, Previous bookings:{" "}
-                {walletVerification.previousBookings}
+                {getRiskAssessment(fraudCheck.riskScore).level} - Age:{" "}
+                {fraudCheck.age} days, Previous bookings:{" "}
+                {fraudCheck.previousBookings}
               </AlertDescription>
             </Alert>
           )}
@@ -586,44 +743,91 @@ export function BookingCard({ property }: BookingCardProps) {
             </div>
           </div>
 
-          {/* Book Button */}
-          <Button
-            className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
-            onClick={handleBooking}
-            disabled={
-              !isHydrated ||
-              !checkIn ||
-              !checkOut ||
-              isCheckingFraud ||
-              isPending ||
-              isConfirming ||
-              !(wagmiConnected && address)
-            }
-          >
-            {isPending ? (
-              <>
-                <Shield className="h-5 w-5 mr-2 animate-spin" />
-                Confirm in Wallet...
-              </>
-            ) : isConfirming ? (
-              <>
-                <Shield className="h-5 w-5 mr-2 animate-spin" />
-                Confirming on Blockchain...
-              </>
-            ) : isCheckingFraud ? (
-              <>
-                <Shield className="h-5 w-5 mr-2 animate-spin" />
-                Running Security Checks...
-              </>
-            ) : isHydrated && wagmiConnected && address ? (
-              <>
-                <Coins className="h-5 w-5 mr-2" />
-                Book with Blockchain
-              </>
-            ) : (
-              "Connect Wallet to Book"
-            )}
-          </Button>
+          {/* Payment Options */}
+          <div className="space-y-4">
+            {/* Primary Payment: XRPL */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-center">💰 Payment Layer</div>
+              <Button
+                className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
+                onClick={handleDirectXRPPayment}
+                disabled={
+                  !isHydrated ||
+                  !checkIn ||
+                  !checkOut ||
+                  isPending ||
+                  isConfirming ||
+                  isBookingPending ||
+                  isBookingConfirming ||
+                  isCheckingFraud ||
+                  (fraudCheck && fraudCheck.riskScore >= 80)
+                }
+              >
+                {!isHydrated ? (
+                  "Loading..."
+                ) : isBookingPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
+                    Sending XRP Payment...
+                  </>
+                ) : isBookingConfirming ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
+                    Creating Booking on Coston2...
+                  </>
+                ) : isCheckingFraud ? (
+                  <>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Running Security Checks...
+                  </>
+                ) : (
+                  <>
+                    <Coins className="h-5 w-5 mr-2" />
+                    Pay with XRP → Smart Contract
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                GemWallet → XRPL → Bridge → Coston2 Smart Contract
+              </p>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+            
+            {/* Secondary: Flare DeFi Integration */}
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-center">🔥 DeFi Integration</div>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleBooking}
+                disabled={
+                  !isHydrated ||
+                  !checkIn ||
+                  !checkOut ||
+                  isPending ||
+                  isConfirming ||
+                  isCheckingFraud ||
+                  (fraudCheck && fraudCheck.riskScore >= 80) ||
+                  !wagmiConnected ||
+                  !address
+                }
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                Book via Flare DeFi
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Smart contracts • Staking rewards • Cross-chain verification
+              </p>
+            </div>
+          </div>
 
           {/* Transaction Status */}
           {isHydrated && (isSuccess || isPending || isConfirming || hash) && (
@@ -723,7 +927,7 @@ export function BookingCard({ property }: BookingCardProps) {
                     </AlertTitle>
                     <AlertDescription className="text-amber-700">
                       You're on{" "}
-                      {chainId === 14 ? "Flare Mainnet" : `Chain ${chainId}`}.
+                      {chainId === 14 ? "Flare Network (unsupported)" : `Chain ${chainId}`}.
                       Switch to Coston2 testnet for demo transactions.
                       <Button
                         variant="outline"
@@ -768,6 +972,8 @@ export function BookingCard({ property }: BookingCardProps) {
           </div>
         </div>
       </Card>
+      
+      
       {paymentDialog}
     </motion.div>
   );

@@ -1,0 +1,358 @@
+{
+  "properties": [
+    {
+      "id": "demo-property-1",
+      "title": "Luxury Beachfront Villa",
+      "description": "Stunning oceanfront property with private beach access, infinity pool, and panoramic views. Perfect for romantic getaways or family vacations.",
+      "location": {
+        "address": "123 Ocean Drive, Maldives",
+        "city": "Malé",
+        "country": "Maldives",
+        "coordinates": {
+          "lat": 4.1755,
+          "lng": 73.5093
+        }
+      },
+      "pricing": {
+        "basePrice": 250,
+        "currency": "XRP",
+        "pricePerNight": 250,
+        "cleaningFee": 50,
+        "serviceFee": 25
+      },
+      "details": {
+        "bedrooms": 3,
+        "bathrooms": 2,
+        "maxGuests": 6,
+        "propertyType": "Villa",
+        "amenities": [
+          "WiFi",
+          "Pool",
+          "Beach Access",
+          "Kitchen",
+          "Air Conditioning",
+          "Parking",
+          "Hot Tub",
+          "Ocean View"
+        ]
+      },
+      "images": [
+        "/luxury-beachfront-villa-maldives.jpg",
+        "/villa-pool-sunset.jpg",
+        "/villa-bedroom-ocean-view.jpg",
+        "/villa-kitchen-modern.jpg"
+      ],
+      "host": {
+        "id": "host-demo-1",
+        "name": "Sarah Johnson",
+        "avatar": "/host-avatar-sarah.jpg",
+        "joinedDate": "2023-01-15",
+        "rating": 4.9,
+        "reviewCount": 127,
+        "verified": true,
+        "superhost": true
+      },
+      "availability": {
+        "instantBook": true,
+        "minStay": 2,
+        "maxStay": 14,
+        "checkIn": "15:00",
+        "checkOut": "11:00"
+      },
+      "ratings": {
+        "overall": 4.8,
+        "cleanliness": 4.9,
+        "accuracy": 4.7,
+        "communication": 4.9,
+        "location": 4.8,
+        "value": 4.6
+      },
+      "reviews": [
+        {
+          "id": "review-1",
+          "guestName": "Michael Chen",
+          "guestAvatar": "/guest-avatar-1.jpg",
+          "rating": 5,
+          "date": "2024-01-15",
+          "comment": "Absolutely stunning property! The ocean views were breathtaking and Sarah was an incredible host. Highly recommend!"
+        },
+        {
+          "id": "review-2",
+          "guestName": "Emma Rodriguez",
+          "guestAvatar": "/guest-avatar-2.jpg",
+          "rating": 5,
+          "date": "2024-01-08",
+          "comment": "Perfect for our honeymoon. The villa exceeded all expectations. Clean, beautiful, and great location."
+        }
+      ],
+      "blockchain": {
+        "contractAddress": "0x1234567890123456789012345678901234567890",
+        "tokenId": 1,
+        "network": "coston2",
+        "verified": true,
+        "createdAt": "2024-01-01T00:00:00Z",
+        "lastUpdated": "2024-01-15T12:00:00Z"
+      },
+      "status": "active",
+      "featured": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T12:00:00Z"
+    },
+    {
+      "id": "demo-property-2",
+      "title": "Mountain Cabin Retreat",
+      "description": "Cozy cabin nestled in the Swiss Alps with stunning mountain views, fireplace, and hiking trails nearby. Perfect for nature lovers.",
+      "location": {
+        "address": "456 Alpine Way, Zermatt",
+        "city": "Zermatt",
+        "country": "Switzerland",
+        "coordinates": {
+          "lat": 46.0207,
+          "lng": 7.7491
+        }
+      },
+      "pricing": {
+        "basePrice": 180,
+        "currency": "XRP",
+        "pricePerNight": 180,
+        "cleaningFee": 30,
+        "serviceFee": 18
+      },
+      "details": {
+        "bedrooms": 2,
+        "bathrooms": 1,
+        "maxGuests": 4,
+        "propertyType": "Cabin",
+        "amenities": [
+          "WiFi",
+          "Fireplace",
+          "Kitchen",
+          "Heating",
+          "Parking",
+          "Mountain View",
+          "Hiking Trails",
+          "Ski Access"
+        ]
+      },
+      "images": [
+        "/mountain-cabin-swiss-alps.jpg",
+        "/cabin-fireplace-cozy.jpg",
+        "/cabin-bedroom-rustic.jpg",
+        "/cabin-kitchen-alpine.jpg"
+      ],
+      "host": {
+        "id": "host-demo-2",
+        "name": "Hans Mueller",
+        "avatar": "/host-avatar-hans.jpg",
+        "joinedDate": "2022-06-20",
+        "rating": 4.7,
+        "reviewCount": 89,
+        "verified": true,
+        "superhost": false
+      },
+      "availability": {
+        "instantBook": false,
+        "minStay": 3,
+        "maxStay": 21,
+        "checkIn": "16:00",
+        "checkOut": "10:00"
+      },
+      "ratings": {
+        "overall": 4.7,
+        "cleanliness": 4.8,
+        "accuracy": 4.6,
+        "communication": 4.7,
+        "location": 4.9,
+        "value": 4.5
+      },
+      "reviews": [
+        {
+          "id": "review-3",
+          "guestName": "Lisa Park",
+          "guestAvatar": "/guest-avatar-3.jpg",
+          "rating": 5,
+          "date": "2024-01-10",
+          "comment": "Amazing mountain retreat! The views were incredible and the cabin was perfectly cozy. Hans was very helpful."
+        }
+      ],
+      "blockchain": {
+        "contractAddress": "0x1234567890123456789012345678901234567890",
+        "tokenId": 2,
+        "network": "coston2",
+        "verified": true,
+        "createdAt": "2024-01-02T00:00:00Z",
+        "lastUpdated": "2024-01-10T15:30:00Z"
+      },
+      "status": "active",
+      "featured": false,
+      "createdAt": "2024-01-02T00:00:00Z",
+      "updatedAt": "2024-01-10T15:30:00Z"
+    }
+  ],
+  "hosts": [
+    {
+      "id": "host-demo-1",
+      "walletAddress": "0xabcdef1234567890abcdef1234567890abcdef12",
+      "profile": {
+        "name": "Sarah Johnson",
+        "bio": "Passionate traveler and property owner with 5+ years of hosting experience. I love sharing my beautiful properties with fellow travelers.",
+        "avatar": "/host-avatar-sarah.jpg",
+        "languages": ["English", "Spanish", "French"],
+        "responseTime": "within an hour",
+        "responseRate": 98
+      },
+      "properties": ["demo-property-1"],
+      "stats": {
+        "totalBookings": 127,
+        "totalEarnings": 31750,
+        "averageRating": 4.9,
+        "reviewCount": 127,
+        "joinedDate": "2023-01-15",
+        "superhost": true,
+        "verified": true
+      },
+      "earnings": {
+        "thisMonth": 2500,
+        "lastMonth": 3200,
+        "thisYear": 28400,
+        "allTime": 31750,
+        "currency": "XRP"
+      },
+      "settings": {
+        "instantBookEnabled": true,
+        "autoAcceptBookings": false,
+        "emailNotifications": true,
+        "smsNotifications": true
+      },
+      "verification": {
+        "email": true,
+        "phone": true,
+        "identity": true,
+        "address": true,
+        "paymentMethod": true
+      },
+      "createdAt": "2023-01-15T00:00:00Z",
+      "updatedAt": "2024-01-15T12:00:00Z"
+    },
+    {
+      "id": "host-demo-2",
+      "walletAddress": "0xfedcba0987654321fedcba0987654321fedcba09",
+      "profile": {
+        "name": "Hans Mueller",
+        "bio": "Local mountain guide and cabin owner. I've been sharing the beauty of the Swiss Alps with guests for over 3 years.",
+        "avatar": "/host-avatar-hans.jpg",
+        "languages": ["German", "English", "Italian"],
+        "responseTime": "within a few hours",
+        "responseRate": 95
+      },
+      "properties": ["demo-property-2"],
+      "stats": {
+        "totalBookings": 89,
+        "totalEarnings": 16020,
+        "averageRating": 4.7,
+        "reviewCount": 89,
+        "joinedDate": "2022-06-20",
+        "superhost": false,
+        "verified": true
+      },
+      "earnings": {
+        "thisMonth": 1800,
+        "lastMonth": 2100,
+        "thisYear": 14200,
+        "allTime": 16020,
+        "currency": "XRP"
+      },
+      "settings": {
+        "instantBookEnabled": false,
+        "autoAcceptBookings": true,
+        "emailNotifications": true,
+        "smsNotifications": false
+      },
+      "verification": {
+        "email": true,
+        "phone": true,
+        "identity": true,
+        "address": false,
+        "paymentMethod": true
+      },
+      "createdAt": "2022-06-20T00:00:00Z",
+      "updatedAt": "2024-01-10T15:30:00Z"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-1",
+      "propertyId": "demo-property-1",
+      "hostId": "host-demo-1",
+      "guestWallet": "0x9876543210987654321098765432109876543210",
+      "guestName": "Michael Chen",
+      "dates": {
+        "checkIn": "2024-02-15",
+        "checkOut": "2024-02-20",
+        "nights": 5
+      },
+      "guests": {
+        "adults": 2,
+        "children": 0,
+        "total": 2
+      },
+      "pricing": {
+        "basePrice": 250,
+        "nights": 5,
+        "subtotal": 1250,
+        "cleaningFee": 50,
+        "serviceFee": 25,
+        "total": 1325,
+        "currency": "XRP"
+      },
+      "payment": {
+        "method": "XRPL",
+        "txHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+        "status": "completed",
+        "paidAt": "2024-01-15T10:30:00Z"
+      },
+      "status": "confirmed",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "analytics": {
+    "totalProperties": 2,
+    "totalHosts": 2,
+    "totalBookings": 216,
+    "totalRevenue": 47770,
+    "averageRating": 4.8,
+    "occupancyRate": 72,
+    "lastUpdated": "2024-01-15T12:00:00Z"
+  },
+  "configuration": {
+    "wallets": {
+      "demo": {
+        "gemWallet": {
+          "address": "rw6gZcjxbKHBN8yEJDMErMhja6jwga6xpT",
+          "network": "XRPL Testnet",
+          "description": "Real GemWallet address for testing XRPL payments"
+        }
+      }
+    },
+    "networks": {
+      "xrpl": {
+        "testnet": {
+          "name": "XRPL Testnet",
+          "faucetUrl": "https://faucet.altnet.rippletest.net/",
+          "explorerUrl": "https://testnet.xrpl.org/",
+          "rpcUrl": "wss://s.altnet.rippletest.net:51233"
+        }
+      },
+      "flare": {
+        "coston2": {
+          "name": "Flare Coston2 Testnet",
+          "chainId": 114,
+          "rpcUrl": "https://coston2-api.flare.network/ext/C/rpc",
+          "explorerUrl": "https://coston2.testnet.flarescan.com",
+          "faucetUrl": "https://faucet.flare.network/coston2"
+        }
+      }
+    }
+  }
+}

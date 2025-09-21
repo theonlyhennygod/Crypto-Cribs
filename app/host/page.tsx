@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useHydration } from "@/hooks/use-hydration";
+import { useHostData } from "@/hooks/use-host-data";
 import {
   Card,
   CardContent,
@@ -40,6 +41,7 @@ import {
 } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { ListPropertyModal } from "@/components/list-property-modal";
+import { useState } from "react";
 import { FraudPreventionDashboard } from "@/components/fraud-prevention-dashboard";
 import { formatXRPAmount } from "@/lib/xrpl-client";
 import { toast } from "sonner";
@@ -154,7 +156,7 @@ function DemoPropertyCreator() {
               <div>
                 <div className="text-amber-600 font-medium">
                   ⚠️ Currently on{" "}
-                  {chainId === 14 ? "Flare Mainnet" : `Chain ${chainId}`}. Need
+                  {chainId === 14 ? "Flare Network (unsupported)" : `Chain ${chainId}`}. Need
                   Coston2 (Chain ID: 114).
                 </div>
                 <details className="mt-2 text-xs text-muted-foreground">
@@ -258,6 +260,57 @@ function DemoPropertyCreator() {
                 : "Create Demo Property"}
             </Button>
           </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Network status component
+function NetworkStatus() {
+  const { chainId } = useAccount();
+  const isHydrated = useHydration();
+
+  if (!isHydrated) return null;
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Network Status
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="text-xs space-y-2" suppressHydrationWarning>
+          {chainId === 114 ? (
+            <div className="text-green-600 font-medium">
+              ✅ Connected to Coston2 testnet
+            </div>
+          ) : (
+            <div className="text-amber-600 font-medium">
+              ⚠️ Please switch to Coston2 (Chain ID: 114) for full functionality
+            </div>
+          )}
+        </div>
+
+        {chainId !== 114 && (
+          <Button
+            onClick={async () => {
+              toast.info("Adding/switching to Coston2...");
+              const added = await addCoston2Network();
+              if (added) {
+                toast.success("Coston2 network ready!");
+              } else {
+                toast.error("Failed to add Coston2. Please add manually in MetaMask.");
+              }
+            }}
+            size="sm"
+            variant="default"
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Switch to Coston2
+          </Button>
         )}
       </CardContent>
     </Card>
@@ -403,6 +456,7 @@ export default function HostDashboard() {
     isLoading,
     error,
   } = useHostProperties(address);
+  const [showListModal, setShowListModal] = useState(false);
 
   // Calculate stats from blockchain data
   const totalProperties = hostPropertyIds?.length || 0;
@@ -549,12 +603,13 @@ export default function HostDashboard() {
                   <Shield className="h-4 w-4" />
                   Verify Properties
                 </Button>
-                <ListPropertyModal>
-                  <Button className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    List New Property
-                  </Button>
-                </ListPropertyModal>
+                <Button 
+                  className="gap-2"
+                  onClick={() => setShowListModal(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                  List New Property
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -616,12 +671,13 @@ export default function HostDashboard() {
                   <h2 className="text-2xl font-semibold text-foreground">
                     Your Properties
                   </h2>
-                  <ListPropertyModal>
-                    <Button className="gap-2">
-                      <Plus className="h-4 w-4" />
-                      Add Property
-                    </Button>
-                  </ListPropertyModal>
+                  <Button 
+                    className="gap-2"
+                    onClick={() => setShowListModal(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Property
+                  </Button>
                 </div>
 
                 {isLoading ? (
@@ -653,9 +709,9 @@ export default function HostDashboard() {
                       Start earning by listing your first property on the
                       blockchain!
                     </p>
-                    <ListPropertyModal>
-                      <Button>List Your First Property</Button>
-                    </ListPropertyModal>
+                    <Button onClick={() => setShowListModal(true)}>
+                      List Your First Property
+                    </Button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -910,6 +966,12 @@ export default function HostDashboard() {
           </motion.div>
         </div>
       </div>
+      
+      {/* List Property Modal */}
+      <ListPropertyModal 
+        open={showListModal} 
+        onOpenChange={setShowListModal} 
+      />
     </div>
   );
 }

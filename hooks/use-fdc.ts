@@ -124,7 +124,7 @@ export function useFDC() {
     sourceAddress: string,
     receivingAddress: string,
     amount: string
-  ): Promise<void> => {
+  ): Promise<{ success: boolean; attestationId?: string; error?: string }> => {
     try {
       if (!publicClient) {
         throw new Error("Not connected to Flare network")
@@ -161,12 +161,13 @@ export function useFDC() {
       }, 5000)
 
       console.log("Attestation request submitted for XRPL transaction:", xrplTxId)
+      return { success: true, attestationId: xrplTxId }
     } catch (error: any) {
       setState(prev => ({
         ...prev,
         error: error.message || "Failed to submit attestation request",
       }))
-      throw error
+      return { success: false, error: error.message || "Failed to submit attestation request" }
     }
   }
 
@@ -183,7 +184,7 @@ export function useFDC() {
       const attestedPayment: PaymentAttestation = {
         ...pending,
         status: "attested",
-        blockNumber: await publicClient?.getBlockNumber(),
+        blockNumber: Number(await publicClient?.getBlockNumber() || 0),
       }
 
       setState(prev => {
@@ -251,7 +252,17 @@ export function useFDC() {
           },
         ],
         functionName: "verifyAttestation",
-        args: [attestationResponse, merkleProof],
+        args: [
+          {
+            attestationType: attestationResponse.attestationType,
+            sourceId: attestationResponse.sourceId,
+            votingRound: Number(attestationResponse.votingRound),
+            lowestUsedTimestamp: Number(attestationResponse.lowestUsedTimestamp),
+            request: attestationResponse.request,
+            response: attestationResponse.response,
+          },
+          merkleProof
+        ],
       })
 
       return Boolean(isValid)

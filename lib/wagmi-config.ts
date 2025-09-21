@@ -24,30 +24,10 @@ const coston2Chain = {
   testnet: true,
 } as const;
 
-// Define Flare mainnet chain
-const flareChain = {
-  id: 14,
-  name: "Flare Network",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Flare",
-    symbol: "FLR",
-  },
-  rpcUrls: {
-    default: {
-      http: ["https://flare-api.flare.network/ext/C/rpc"],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Flare Explorer",
-      url: "https://flarescan.com",
-    },
-  },
-} as const;
+// Note: Using Coston2 testnet only for development and testing
 
 export const config = createConfig({
-  chains: [coston2Chain, flareChain],
+  chains: [coston2Chain],
   multiInjectedProviderDiscovery: false, // Reduce wallet conflicts
   connectors: [
     injected(), // Generic injected connector - detects all wallets including Gem Wallet
@@ -64,7 +44,6 @@ export const config = createConfig({
   ],
   transports: {
     [coston2Chain.id]: http("https://coston2-api.flare.network/ext/C/rpc"),
-    [flareChain.id]: http("https://flare-api.flare.network/ext/C/rpc"),
   },
 });
 

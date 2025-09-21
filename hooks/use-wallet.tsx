@@ -53,14 +53,15 @@ interface WalletActions {
   clearError: () => void;
 
   sendXRPPayment: (
-    amount: number,
     destination: string,
+    amount: number,
     memo?: string
-  ) => Promise<string>;
+  ) => Promise<{ success: boolean; txHash?: string; error?: string }>;
   stakeFlare: (amount: number) => Promise<string>;
   unstakeFlare: (amount: number) => Promise<string>;
   getStakingRewards: () => Promise<number>;
   refreshBalances: () => Promise<void>;
+  getWalletHistory: () => Array<{walletType: WalletType; timestamp: number; url: string}>;
 }
 
 // Combined context type
@@ -71,14 +72,27 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 // Storage keys
 const WALLET_STORAGE_KEY = "cryptocribs_wallet_state";
+const WALLET_HISTORY_KEY = "cryptocribs_wallet_history";
 
-// Helper functions for localStorage
+// Enhanced wallet state persistence with history tracking
 const saveWalletState = (state: Partial<WalletState>) => {
   if (typeof window === "undefined") return;
   try {
     const existingState = getStoredWalletState();
-    const newState = { ...existingState, ...state };
+    const newState = { ...existingState, ...state, lastUpdated: Date.now() };
     localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(newState));
+    
+    // Track wallet switching history
+    if (state.activeWallet && state.activeWallet !== existingState.activeWallet) {
+      saveWalletHistory(state.activeWallet);
+    }
+    
+    console.log("💾 Wallet state saved:", {
+      activeWallet: newState.activeWallet,
+      metamaskConnected: newState.metamaskConnected,
+      gemConnected: newState.gemConnected,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     console.warn("Failed to save wallet state:", error);
   }
@@ -95,10 +109,40 @@ const getStoredWalletState = (): Partial<WalletState> => {
   }
 };
 
+const saveWalletHistory = (walletType: WalletType) => {
+  if (typeof window === "undefined" || !walletType) return;
+  try {
+    const history = getWalletHistory();
+    const newEntry = {
+      walletType,
+      timestamp: Date.now(),
+      url: window.location.pathname
+    };
+    
+    // Keep only last 10 entries
+    const updatedHistory = [newEntry, ...history.slice(0, 9)];
+    localStorage.setItem(WALLET_HISTORY_KEY, JSON.stringify(updatedHistory));
+  } catch (error) {
+    console.warn("Failed to save wallet history:", error);
+  }
+};
+
+const getWalletHistory = () => {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(WALLET_HISTORY_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.warn("Failed to load wallet history:", error);
+    return [];
+  }
+};
+
 const clearStoredWalletState = () => {
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(WALLET_STORAGE_KEY);
+    localStorage.removeItem(WALLET_HISTORY_KEY);
   } catch (error) {
     console.warn("Failed to clear wallet state:", error);
   }
@@ -170,38 +214,45 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     if (state.gemConnected && state.gemAddress) {
       try {
-        // Use demo balance for now due to CORS limitations
-        let xrpBalance = "4.25"; // Demo balance
-
+        console.log("💎 Getting real XRPL balance directly from GemWallet...");
+        
+        // Use GemWallet API directly to get real balance
+        const { getBalance } = await import("@gemwallet/api");
+        const balanceResponse = await getBalance();
+        
+        if (balanceResponse.result && balanceResponse.result.balance) {
+          const xrpBalance = balanceResponse.result.balance;
+          
+          setStateWithPersistence((prev) => ({
+            ...prev,
+            gemBalance: xrpBalance,
+            xrplWallet: { ...prev.xrplWallet, balance: xrpBalance },
+          }));
+          
+          console.log("✅ Real GemWallet balance:", xrpBalance, "XRP");
+        } else {
+          console.log("⚠️ Could not get balance from GemWallet API");
+        }
+      } catch (error) {
+        console.warn("Failed to get GemWallet balance:", error);
+        
+        // Try the XRPL API as fallback
         try {
-          const response = await fetch(
-            `https://testnet.xrpl.org/accounts/${state.gemAddress}`,
-            {
-              method: "GET",
-              headers: {
-                Accept: "application/json",
-              },
-            }
-          );
-
+          const response = await fetch(`/api/xrpl/balance?address=${state.gemAddress}`);
           if (response.ok) {
             const data = await response.json();
-            if (data.account_data && data.account_data.Balance) {
-              const balanceInDrops = parseInt(data.account_data.Balance);
-              xrpBalance = (balanceInDrops / 1000000).toFixed(2);
+            if (data.success) {
+              setStateWithPersistence((prev) => ({
+                ...prev,
+                gemBalance: data.balance,
+                xrplWallet: { ...prev.xrplWallet, balance: data.balance },
+              }));
+              console.log("✅ XRPL API balance:", data.balance, "XRP");
             }
           }
         } catch (apiError) {
-          console.log("📡 Using demo XRPL balance due to API limitations");
+          console.warn("Both GemWallet and XRPL API failed:", apiError);
         }
-
-        setStateWithPersistence((prev) => ({
-          ...prev,
-          gemBalance: xrpBalance,
-          xrplWallet: { ...prev.xrplWallet, balance: xrpBalance },
-        }));
-      } catch (error) {
-        console.warn("Failed to refresh XRPL balance:", error);
       }
     }
   };
@@ -425,7 +476,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       console.log("🔗 Connecting to GemWallet using official API...");
 
       // Check if Gem Wallet is installed using official API
-      const installedResponse = await isInstalled();
+      const installedResponse = await Promise.race([
+        isInstalled(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 3000)
+        )
+      ]);
       console.log("🔍 GemWallet isInstalled response:", installedResponse);
 
       // Handle different response formats
@@ -444,8 +500,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       console.log("✅ GemWallet is installed, requesting address...");
 
-      // Get wallet address using official API
-      const addressResponse = await getAddress();
+      // Get wallet address using official API with timeout
+      const addressResponse = await Promise.race([
+        getAddress(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Address request timeout')), 5000)
+        )
+      ]);
+      
       if (!addressResponse.result || !addressResponse.result.address) {
         throw new Error(
           "Failed to get wallet address. Connection may have been rejected."
@@ -455,45 +517,42 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const address = addressResponse.result.address;
       console.log("✅ Got GemWallet address:", address);
 
-      // Get network info using official API
-      const networkResponse = await getNetwork();
+      // Get network info using official API with timeout
+      const networkResponse = await Promise.race([
+        getNetwork(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Network request timeout')), 3000)
+        )
+      ]);
       console.log("✅ Got GemWallet network:", networkResponse.result);
 
-      // For demo purposes, show a realistic testnet balance
-      // In production, you'd use a backend API or XRPL library to avoid CORS
-      let xrpBalance = "4.25"; // Demo balance matching your testnet funds
+      // Get real balance directly from GemWallet
+      let xrpBalance = "0.00";
 
       try {
-        console.log("🔍 Fetching XRPL testnet balance for:", address);
-
-        // Try to fetch real balance using XRPL testnet API
-        // Note: This might fail due to CORS in browser, so we fallback to demo balance
-        const response = await fetch(
-          `https://testnet.xrpl.org/accounts/${address}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.account_data && data.account_data.Balance) {
-            // Convert drops to XRP (1 XRP = 1,000,000 drops)
-            const balanceInDrops = parseInt(data.account_data.Balance);
-            xrpBalance = (balanceInDrops / 1000000).toFixed(2);
-            console.log("✅ XRPL balance fetched:", xrpBalance, "XRP");
-          }
+        console.log("💎 Getting real balance from GemWallet...");
+        
+        const balanceResponse = await getBalance();
+        
+        if (balanceResponse.result && balanceResponse.result.balance) {
+          xrpBalance = balanceResponse.result.balance;
+          console.log("✅ Real GemWallet balance:", xrpBalance, "XRP");
         } else {
-          console.log("📡 Using demo balance due to API limitations");
+          console.log("⚠️ Could not get balance from GemWallet, trying XRPL API...");
+          
+          // Fallback to XRPL API
+          const response = await fetch(`/api/xrpl/balance?address=${address}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.balance) {
+              xrpBalance = data.balance;
+              console.log("✅ XRPL API balance:", xrpBalance, "XRP");
+            }
+          }
         }
-      } catch (balanceError) {
-        console.log(
-          "📡 Using demo balance due to CORS/API limitations:",
-          balanceError.message
-        );
+      } catch (error: any) {
+        console.log("⚠️ Balance fetch failed:", error.message);
+        xrpBalance = "0.00"; // Show 0 instead of fake balance
       }
 
       setStateWithPersistence((prev) => ({
@@ -519,10 +578,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   };
 
   const sendXRPPayment = async (
-    amount: number,
     destination: string,
+    amount: number,
     memo?: string
-  ): Promise<string> => {
+  ): Promise<{ success: boolean; txHash?: string; error?: string }> => {
     try {
       if (!state.gemConnected) {
         throw new Error("Gem Wallet not connected");
@@ -578,10 +637,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("[v0] XRPL payment submitted:", response.result.hash);
-      return response.result.hash;
+      return { success: true, txHash: response.result.hash };
     } catch (error: any) {
       console.error("[v0] XRPL payment failed:", error);
-      throw error;
+      return { success: false, error: error.message || "Payment failed" };
     }
   };
 
@@ -697,9 +756,36 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // Switch active wallet
+  // Switch active wallet with enhanced tracking
   const switchWallet = (walletType: WalletType) => {
-    setState((prev) => ({ ...prev, activeWallet: walletType }));
+    const previousWallet = state.activeWallet;
+    
+    console.log("🔄 Switching wallet:", {
+      from: previousWallet,
+      to: walletType,
+      page: typeof window !== "undefined" ? window.location.pathname : "unknown",
+      timestamp: new Date().toISOString()
+    });
+    
+    setState((prev) => {
+      const newState = { ...prev, activeWallet: walletType };
+      
+      // Save state immediately when switching
+      saveWalletState({ activeWallet: walletType });
+      
+      return newState;
+    });
+    
+    // Dispatch custom event for other components to track wallet changes
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent('walletSwitched', {
+        detail: {
+          previousWallet,
+          newWallet: walletType,
+          timestamp: Date.now()
+        }
+      }));
+    }
   };
 
   // Clear error
@@ -753,9 +839,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (state.gemConnected && !state.gemAddress) {
         console.log("🔄 Auto-reconnecting GemWallet...");
         try {
-          await connectGemWallet();
-        } catch (error) {
-          console.warn("Auto-reconnect GemWallet failed:", error);
+          // Check if GemWallet is still available before attempting reconnection
+          const installedCheck = await isInstalled();
+          if (installedCheck === true || installedCheck?.result === true) {
+            await connectGemWallet();
+          } else {
+            console.log("📡 GemWallet not available for auto-reconnect");
+          }
+        } catch (error: any) {
+          // Silently handle auto-reconnect failures to avoid console spam
+          console.log("📡 Auto-reconnect skipped:", error.message);
         }
       }
     };
@@ -852,6 +945,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     unstakeFlare,
     getStakingRewards,
     refreshBalances,
+    getWalletHistory,
   };
 
   return (
