@@ -1,8 +1,18 @@
-"use client"
+"use client";
 
-import { WalletProvider } from "@/hooks/use-wallet"
-import type { ReactNode } from "react"
+import { WalletProvider } from "@/hooks/use-wallet";
+import { ThemeProvider } from "@/components/theme-provider";
+import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <WalletProvider>{children}</WalletProvider>
+  return (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <WalletProvider>{children}</WalletProvider>
+    </ThemeProvider>
+  );
 }

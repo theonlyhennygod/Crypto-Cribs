@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { WalletStatus } from "./wallet-status"
-import { Menu, X } from "lucide-react"
-import { useState } from "react"
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { WalletStatus } from "./wallet-status";
+import { ModeToggle } from "./mode-toggle";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 
 export function Navigation() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
     { label: "Properties", href: "/" },
@@ -15,7 +16,7 @@ export function Navigation() {
     { label: "DeFi", href: "/defi" },
     { label: "Rewards", href: "/rewards" },
     { label: "Host", href: "/host" },
-  ]
+  ];
 
   return (
     <motion.nav
@@ -27,9 +28,14 @@ export function Navigation() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-2"
+          >
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">CC</span>
+              <span className="text-primary-foreground font-bold text-sm">
+                CC
+              </span>
             </div>
             <span className="text-xl font-bold">Crypto Cribs</span>
           </motion.div>
@@ -47,14 +53,24 @@ export function Navigation() {
             ))}
           </div>
 
-          {/* Wallet Status */}
-          <div className="hidden md:block">
+          {/* Wallet Status & Theme Toggle */}
+          <div className="hidden md:flex items-center gap-4">
+            <ModeToggle />
             <WalletStatus />
           </div>
 
           {/* Mobile Menu Button */}
-          <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
         </div>
 
@@ -77,7 +93,8 @@ export function Navigation() {
                   {item.label}
                 </a>
               ))}
-              <div className="pt-4 border-t border-border">
+              <div className="pt-4 border-t border-border space-y-4">
+                <ModeToggle />
                 <WalletStatus />
               </div>
             </div>
@@ -85,5 +102,5 @@ export function Navigation() {
         )}
       </div>
     </motion.nav>
-  )
+  );
 }

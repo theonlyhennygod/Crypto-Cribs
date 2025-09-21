@@ -64,7 +64,7 @@ export function HeroSection() {
         >
           Travel Without
           <br />
-          <span className="text-primary animate-glow">Limitation</span>
+          <span className="text-primary">Limitation</span>
         </motion.h1>
 
         <motion.p
