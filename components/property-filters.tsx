@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, X, MapPin, Calendar, Users } from "lucide-react"
+import { Search, Filter, X, MapPin, Calendar, Users, ChevronDown } from "lucide-react"
 import { useState } from "react"
 
 interface FilterState {
@@ -28,6 +28,7 @@ interface PropertyFiltersProps {
 
 export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false)
   const [filters, setFilters] = useState<FilterState>({
     location: "",
     checkIn: "",
@@ -38,6 +39,27 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
     propertyTypes: [],
     amenities: [],
   })
+
+  const availableLocations = [
+    "Maldives",
+    "Tokyo, Japan", 
+    "Swiss Alps",
+    "Barcelona, Spain",
+    "Miami Beach, USA",
+    "Kyoto, Japan",
+    "New York, NY",
+    "Los Angeles, CA",
+    "San Francisco, CA",
+    "Chicago, IL",
+    "Boston, MA",
+    "Seattle, WA",
+    "Austin, TX",
+    "Denver, CO",
+    "San Diego, CA",
+    "Portland, OR",
+    "Las Vegas, NV",
+    "Philadelphia, PA"
+  ]
 
   const propertyTypes = ["Apartment", "House", "Villa", "Condo", "Loft", "Studio"]
 
@@ -89,6 +111,15 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
     updateFilters({ amenities: updated })
   }
 
+  const selectLocation = (location: string) => {
+    updateFilters({ location })
+    setShowLocationDropdown(false)
+  }
+
+  const filteredLocations = availableLocations.filter(location =>
+    location.toLowerCase().includes(filters.location.toLowerCase())
+  )
+
   return (
     <div className="space-y-6">
       {/* Main Search Bar */}
@@ -105,8 +136,34 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
                 placeholder="Where to?"
                 value={filters.location}
                 onChange={(e) => updateFilters({ location: e.target.value })}
-                className="pl-10"
+                onFocus={() => setShowLocationDropdown(true)}
+                onBlur={() => setTimeout(() => setShowLocationDropdown(false), 200)}
+                className="pl-10 pr-10"
               />
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer" 
+                onClick={() => setShowLocationDropdown(!showLocationDropdown)} />
+              
+              {/* Location Dropdown */}
+              {showLocationDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {filteredLocations.length > 0 ? (
+                    filteredLocations.map((location) => (
+                      <button
+                        key={location}
+                        onClick={() => selectLocation(location)}
+                        className="w-full px-4 py-2 text-left hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        {location}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-muted-foreground text-sm">
+                      No locations found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

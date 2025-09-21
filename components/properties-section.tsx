@@ -22,6 +22,7 @@ const mockProperties = [
     guests: 8,
     bedrooms: 4,
     bathrooms: 3,
+    propertyType: "Villa",
     images: ["/luxury-beachfront-villa-maldives.jpg", "/villa-pool-maldives.jpg", "/villa-bedroom-luxury.jpg"],
     amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Air conditioning"],
     host: "Sarah Chen",
@@ -40,6 +41,7 @@ const mockProperties = [
     guests: 4,
     bedrooms: 2,
     bathrooms: 2,
+    propertyType: "Loft",
     images: ["/modern-loft-tokyo-city-view.jpg", "/loft-interior-modern.jpg", "/tokyo-skyline-view.jpg"],
     amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning"],
     host: "Kenji Tanaka",
@@ -58,6 +60,7 @@ const mockProperties = [
     guests: 6,
     bedrooms: 3,
     bathrooms: 2,
+    propertyType: "House",
     images: ["/mountain-cabin-swiss-alps.jpg", "/cabin-hot-tub-mountains.jpg", "/cozy-cabin-interior.png"],
     amenities: ["WiFi", "Kitchen", "Heating", "Hot Tub"],
     host: "Hans Mueller",
@@ -76,6 +79,7 @@ const mockProperties = [
     guests: 2,
     bedrooms: 1,
     bathrooms: 1,
+    propertyType: "Studio",
     images: ["/stylish-studio-barcelona-historic.jpg", "/barcelona-apartment-interior.jpg", "/historic-district-barcelona.jpg"],
     amenities: ["WiFi", "Kitchen", "Air conditioning"],
     host: "Maria Rodriguez",
@@ -94,6 +98,7 @@ const mockProperties = [
     guests: 10,
     bedrooms: 5,
     bathrooms: 4,
+    propertyType: "Condo",
     images: ["/oceanfront-penthouse-miami-beach.jpg", "/infinity-pool-ocean-view.png", "/luxury-penthouse-interior.png"],
     amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Gym", "Air conditioning"],
     host: "David Johnson",
@@ -112,11 +117,241 @@ const mockProperties = [
     guests: 4,
     bedrooms: 2,
     bathrooms: 1,
+    propertyType: "House",
     images: ["/traditional-ryokan-kyoto-garden.jpg", "/japanese-garden-ryokan.jpg", "/traditional-japanese-room.jpg"],
     amenities: ["WiFi", "Kitchen", "Garden", "Traditional Bath"],
     host: "Yuki Sato",
     isVerified: true,
     discount: 31,
+  },
+  // US Cities Properties
+  {
+    id: "7",
+    title: "Luxury Manhattan Penthouse with City Views",
+    location: "New York, NY",
+    price: 520,
+    originalPrice: 750,
+    currency: "XRP" as const,
+    rating: 4.9,
+    reviews: 89,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 2,
+    propertyType: "Condo",
+    images: ["/luxury-penthouse-interior.png", "/modern-penthouse.png", "/tokyo-skyline-view.jpg"],
+    amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning", "City View"],
+    host: "Michael Chen",
+    isVerified: true,
+    discount: 30,
+  },
+  {
+    id: "8",
+    title: "Modern Loft in Downtown LA",
+    location: "Los Angeles, CA",
+    price: 380,
+    originalPrice: 520,
+    currency: "XRP" as const,
+    rating: 4.7,
+    reviews: 156,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    propertyType: "Loft",
+    images: ["/loft-interior-modern.jpg", "/modern-loft-tokyo-city-view.jpg", "/tokyo-cityscape-neon-lights.jpg"],
+    amenities: ["WiFi", "Kitchen", "Parking", "Air conditioning", "Workspace"],
+    host: "Sarah Williams",
+    isVerified: true,
+    discount: 27,
+  },
+  {
+    id: "9",
+    title: "Charming Victorian House in San Francisco",
+    location: "San Francisco, CA",
+    price: 420,
+    originalPrice: 580,
+    currency: "XRP" as const,
+    rating: 4.8,
+    reviews: 203,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 2,
+    propertyType: "House",
+    images: ["/barcelona-apartment-interior.jpg", "/historic-district-barcelona.jpg", "/mountain-cabin-retreat.png"],
+    amenities: ["WiFi", "Kitchen", "Parking", "Heating", "Garden"],
+    host: "David Rodriguez",
+    isVerified: true,
+    discount: 28,
+  },
+  {
+    id: "10",
+    title: "Luxury Apartment in Chicago Loop",
+    location: "Chicago, IL",
+    price: 290,
+    originalPrice: 420,
+    currency: "FLR" as const,
+    rating: 4.6,
+    reviews: 127,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    propertyType: "Apartment",
+    images: ["/modern-loft-tokyo-city-view.jpg", "/luxury-penthouse-interior.png", "/tokyo-cityscape-neon-lights.jpg"],
+    amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning", "City View"],
+    host: "Jennifer Martinez",
+    isVerified: true,
+    discount: 31,
+  },
+  {
+    id: "11",
+    title: "Historic Brownstone in Boston",
+    location: "Boston, MA",
+    price: 350,
+    originalPrice: 480,
+    currency: "XRP" as const,
+    rating: 4.7,
+    reviews: 94,
+    guests: 5,
+    bedrooms: 2,
+    bathrooms: 2,
+    propertyType: "House",
+    images: ["/historic-district-barcelona.jpg", "/barcelona-apartment-interior.jpg", "/stylish-studio-barcelona-historic.jpg"],
+    amenities: ["WiFi", "Kitchen", "Heating", "Garden", "Parking"],
+    host: "Robert Thompson",
+    isVerified: true,
+    discount: 27,
+  },
+  {
+    id: "12",
+    title: "Modern Studio in Seattle Downtown",
+    location: "Seattle, WA",
+    price: 180,
+    originalPrice: 260,
+    currency: "FLR" as const,
+    rating: 4.5,
+    reviews: 78,
+    guests: 2,
+    bedrooms: 1,
+    bathrooms: 1,
+    propertyType: "Studio",
+    images: ["/stylish-studio-barcelona-historic.jpg", "/modern-penthouse.png", "/tokyo-skyline-view.jpg"],
+    amenities: ["WiFi", "Kitchen", "Air conditioning", "Workspace"],
+    host: "Lisa Anderson",
+    isVerified: true,
+    discount: 31,
+  },
+  {
+    id: "13",
+    title: "Luxury Condo in Austin Downtown",
+    location: "Austin, TX",
+    price: 320,
+    originalPrice: 450,
+    currency: "XRP" as const,
+    rating: 4.8,
+    reviews: 145,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    propertyType: "Condo",
+    images: ["/modern-penthouse.png", "/infinity-pool-ocean-view.png", "/tokyo-skyline-view.jpg"],
+    amenities: ["WiFi", "Kitchen", "Pool", "Gym", "Air conditioning"],
+    host: "James Wilson",
+    isVerified: true,
+    discount: 29,
+  },
+  {
+    id: "14",
+    title: "Cozy Cabin in Denver Mountains",
+    location: "Denver, CO",
+    price: 280,
+    originalPrice: 380,
+    currency: "XRP" as const,
+    rating: 4.6,
+    reviews: 112,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 2,
+    propertyType: "House",
+    images: ["/mountain-cabin-swiss-alps.jpg", "/cabin-hot-tub-mountains.jpg", "/cozy-cabin-interior.png"],
+    amenities: ["WiFi", "Kitchen", "Heating", "Hot Tub", "Mountain View"],
+    host: "Amanda Davis",
+    isVerified: true,
+    discount: 26,
+  },
+  {
+    id: "15",
+    title: "Beachfront Villa in San Diego",
+    location: "San Diego, CA",
+    price: 480,
+    originalPrice: 680,
+    currency: "XRP" as const,
+    rating: 4.9,
+    reviews: 167,
+    guests: 8,
+    bedrooms: 4,
+    bathrooms: 3,
+    propertyType: "Villa",
+    images: ["/luxury-beachfront-villa-maldives.jpg", "/villa-pool-maldives.jpg", "/villa-bedroom-luxury.jpg"],
+    amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Beach Access", "Air conditioning"],
+    host: "Carlos Mendez",
+    isVerified: true,
+    discount: 29,
+  },
+  {
+    id: "16",
+    title: "Modern Apartment in Portland Pearl District",
+    location: "Portland, OR",
+    price: 220,
+    originalPrice: 320,
+    currency: "FLR" as const,
+    rating: 4.5,
+    reviews: 89,
+    guests: 3,
+    bedrooms: 1,
+    bathrooms: 1,
+    propertyType: "Apartment",
+    images: ["/barcelona-apartment-interior.jpg", "/mountain-cabin-retreat.png", "/cozy-cabin-interior.png"],
+    amenities: ["WiFi", "Kitchen", "Air conditioning", "Workspace"],
+    host: "Rachel Green",
+    isVerified: true,
+    discount: 31,
+  },
+  {
+    id: "17",
+    title: "Luxury Penthouse in Las Vegas Strip",
+    location: "Las Vegas, NV",
+    price: 450,
+    originalPrice: 650,
+    currency: "XRP" as const,
+    rating: 4.7,
+    reviews: 134,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 3,
+    propertyType: "Condo",
+    images: ["/oceanfront-penthouse-miami-beach.jpg", "/infinity-pool-ocean-view.png", "/modern-penthouse.png"],
+    amenities: ["WiFi", "Pool", "Kitchen", "Gym", "Air conditioning", "City View"],
+    host: "Anthony Vegas",
+    isVerified: true,
+    discount: 31,
+  },
+  {
+    id: "18",
+    title: "Historic Townhouse in Philadelphia",
+    location: "Philadelphia, PA",
+    price: 260,
+    originalPrice: 380,
+    currency: "FLR" as const,
+    rating: 4.4,
+    reviews: 76,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    propertyType: "House",
+    images: ["/historic-district-barcelona.jpg", "/mountain-cabin-retreat.png", "/cozy-cabin-interior.png"],
+    amenities: ["WiFi", "Kitchen", "Heating", "Parking", "Garden"],
+    host: "Patricia Brown",
+    isVerified: true,
+    discount: 32,
   },
 ]
 
@@ -124,12 +359,99 @@ export function PropertiesSection() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [filteredProperties, setFilteredProperties] = useState(mockProperties)
   const [sortBy, setSortBy] = useState("recommended")
+  const [displayedCount, setDisplayedCount] = useState(9)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleFiltersChange = (filters: any) => {
-    // In a real app, this would filter the properties based on the filters
-    // For now, we'll just keep all properties
-    setFilteredProperties(mockProperties)
+    let filtered = [...mockProperties]
+
+    // Filter by location
+    if (filters.location) {
+      filtered = filtered.filter(property =>
+        property.location.toLowerCase().includes(filters.location.toLowerCase())
+      )
+    }
+
+    // Filter by price range
+    if (filters.priceRange) {
+      filtered = filtered.filter(property => {
+        const price = property.price
+        return price >= filters.priceRange[0] && price <= filters.priceRange[1]
+      })
+    }
+
+    // Filter by currency
+    if (filters.currency && filters.currency !== "both") {
+      filtered = filtered.filter(property => property.currency === filters.currency)
+    }
+
+    // Filter by property types
+    if (filters.propertyTypes && filters.propertyTypes.length > 0) {
+      filtered = filtered.filter(property => {
+        return filters.propertyTypes.includes(property.propertyType)
+      })
+    }
+
+    // Filter by amenities
+    if (filters.amenities && filters.amenities.length > 0) {
+      filtered = filtered.filter(property =>
+        filters.amenities.every((amenity: string) =>
+          property.amenities.some(propAmenity =>
+            propAmenity.toLowerCase().includes(amenity.toLowerCase())
+          )
+        )
+      )
+    }
+
+    // Filter by guests
+    if (filters.guests) {
+      filtered = filtered.filter(property => property.guests >= filters.guests)
+    }
+
+    setFilteredProperties(filtered)
+    setDisplayedCount(9) // Reset to show first 9 properties when filters change
   }
+
+  const handleLoadMore = () => {
+    setIsLoading(true)
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+      setDisplayedCount(prev => Math.min(prev + 9, filteredProperties.length))
+      setIsLoading(false)
+    }, 500)
+  }
+
+  const sortProperties = (properties: typeof mockProperties, sortBy: string) => {
+    const sorted = [...properties]
+    
+    switch (sortBy) {
+      case "price-low":
+        return sorted.sort((a, b) => a.price - b.price)
+      case "price-high":
+        return sorted.sort((a, b) => b.price - a.price)
+      case "rating":
+        return sorted.sort((a, b) => b.rating - a.rating)
+      case "reviews":
+        return sorted.sort((a, b) => b.reviews - a.reviews)
+      case "discount":
+        return sorted.sort((a, b) => (b.discount || 0) - (a.discount || 0))
+      case "newest":
+        // Sort by ID (assuming higher ID = newer property)
+        return sorted.sort((a, b) => parseInt(b.id) - parseInt(a.id))
+      case "recommended":
+      default:
+        // Recommended: Mix of rating, reviews, and discount
+        return sorted.sort((a, b) => {
+          const scoreA = (a.rating * 0.4) + (a.reviews / 100 * 0.3) + ((a.discount || 0) / 100 * 0.3)
+          const scoreB = (b.rating * 0.4) + (b.reviews / 100 * 0.3) + ((b.discount || 0) / 100 * 0.3)
+          return scoreB - scoreA
+        })
+    }
+  }
+
+  const sortedProperties = sortProperties(filteredProperties, sortBy)
+  const displayedProperties = sortedProperties.slice(0, displayedCount)
+  const hasMoreProperties = displayedCount < filteredProperties.length
 
   const totalSavings = filteredProperties.reduce((sum, property) => {
     const savings = property.originalPrice ? property.originalPrice - property.price : 0
@@ -180,7 +502,7 @@ export function PropertiesSection() {
           className="flex items-center justify-between mb-8"
         >
           <div className="flex items-center gap-4">
-            <span className="text-lg font-semibold">{filteredProperties.length} properties found</span>
+            <span className="text-lg font-semibold">{displayedProperties.length} of {filteredProperties.length} properties shown</span>
             <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/20">
               Total savings: {totalSavings} XRP/FLR
             </Badge>
@@ -189,13 +511,17 @@ export function PropertiesSection() {
           <div className="flex items-center gap-4">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => {
+                setSortBy(e.target.value)
+                setDisplayedCount(9) // Reset to show first 9 properties when sorting changes
+              }}
               className="bg-background border border-border rounded-lg px-3 py-2 text-sm"
             >
               <option value="recommended">Recommended</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
               <option value="rating">Highest Rated</option>
+              <option value="reviews">Most Reviews</option>
               <option value="newest">Newest</option>
             </select>
 
@@ -228,7 +554,7 @@ export function PropertiesSection() {
           viewport={{ once: true }}
           className={`grid gap-8 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
         >
-          {filteredProperties.map((property, index) => (
+          {displayedProperties.map((property, index) => (
             <motion.div
               key={property.id}
               initial={{ opacity: 0, y: 30 }}
@@ -242,17 +568,32 @@ export function PropertiesSection() {
         </motion.div>
 
         {/* Load More */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <Button variant="outline" size="lg" className="px-8 bg-transparent">
-            Load More Properties
-          </Button>
-        </motion.div>
+        {hasMoreProperties && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="px-8 bg-transparent"
+              onClick={handleLoadMore}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                  Loading...
+                </>
+              ) : (
+                `Load More Properties (${filteredProperties.length - displayedCount} remaining)`
+              )}
+            </Button>
+          </motion.div>
+        )}
       </div>
     </section>
   )

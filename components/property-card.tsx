@@ -20,6 +20,7 @@ interface PropertyCardProps {
     guests: number
     bedrooms: number
     bathrooms: number
+    propertyType: string
     images: string[]
     amenities: string[]
     host: string
