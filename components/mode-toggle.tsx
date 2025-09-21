@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  // Avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleTheme = () => {
     if (theme === "light") {
@@ -20,6 +26,11 @@ export function ModeToggle() {
   };
 
   const getIcon = () => {
+    if (!mounted) {
+      // Return a consistent icon during SSR
+      return <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />;
+    }
+
     if (theme === "light") {
       return <Sun className="h-[1.2rem] w-[1.2rem] transition-all" />;
     } else if (theme === "dark") {
@@ -30,6 +41,16 @@ export function ModeToggle() {
       return <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />;
     }
   };
+
+  if (!mounted) {
+    // Return a loading state that matches the server render
+    return (
+      <Button variant="outline" size="icon" disabled>
+        <Monitor className="h-[1.2rem] w-[1.2rem] transition-all" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
+  }
 
   return (
     <Button variant="outline" size="icon" onClick={toggleTheme}>

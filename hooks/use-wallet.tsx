@@ -1,52 +1,66 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 // Wallet types
-export type WalletType = "metamask" | "gem" | null
-export type ConnectionStatus = "disconnected" | "connecting" | "connected" | "error"
+export type WalletType = "metamask" | "gem" | null;
+export type ConnectionStatus =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "error";
 
 // Enhanced wallet state interface
 interface WalletState {
   // MetaMask (Flare) state
-  metamaskAddress: string | null
-  metamaskBalance: string | null
-  metamaskConnected: boolean
+  metamaskAddress: string | null;
+  metamaskBalance: string | null;
+  metamaskConnected: boolean;
 
   // Gem Wallet (XRPL) state
-  gemAddress: string | null
-  gemBalance: string | null
-  gemConnected: boolean
+  gemAddress: string | null;
+  gemBalance: string | null;
+  gemConnected: boolean;
 
   // General state
-  activeWallet: WalletType
-  connectionStatus: ConnectionStatus
-  error: string | null
+  activeWallet: WalletType;
+  connectionStatus: ConnectionStatus;
+  error: string | null;
 
-  isConnected: boolean
-  xrplWallet: { address: string; balance: string } | null
-  flareWallet: { address: string; balance: string } | null
+  isConnected: boolean;
+  xrplWallet: { address: string; balance: string } | null;
+  flareWallet: { address: string; balance: string } | null;
 }
 
 // Enhanced wallet actions interface
 interface WalletActions {
-  connectMetaMask: () => Promise<void>
-  connectGemWallet: () => Promise<void>
-  disconnectWallet: (walletType: WalletType) => void
-  switchWallet: (walletType: WalletType) => void
-  clearError: () => void
+  connectMetaMask: () => Promise<void>;
+  connectGemWallet: () => Promise<void>;
+  disconnectWallet: (walletType: WalletType) => void;
+  switchWallet: (walletType: WalletType) => void;
+  clearError: () => void;
 
-  sendXRPPayment: (amount: number, destination: string, memo?: string) => Promise<string>
-  stakeFlare: (amount: number) => Promise<string>
-  unstakeFlare: (amount: number) => Promise<string>
-  getStakingRewards: () => Promise<number>
+  sendXRPPayment: (
+    amount: number,
+    destination: string,
+    memo?: string
+  ) => Promise<string>;
+  stakeFlare: (amount: number) => Promise<string>;
+  unstakeFlare: (amount: number) => Promise<string>;
+  getStakingRewards: () => Promise<number>;
 }
 
 // Combined context type
-type WalletContextType = WalletState & WalletActions
+type WalletContextType = WalletState & WalletActions;
 
 // Create context
-const WalletContext = createContext<WalletContextType | undefined>(undefined)
+const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 // Initial state
 const initialState: WalletState = {
@@ -62,35 +76,50 @@ const initialState: WalletState = {
   isConnected: false,
   xrplWallet: null,
   flareWallet: null,
-}
+};
 
 // Wallet Provider Component
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<WalletState>(initialState)
+  const [state, setState] = useState<WalletState>(initialState);
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // MetaMask connection
   const connectMetaMask = async () => {
     try {
-      setState((prev) => ({ ...prev, connectionStatus: "connecting", error: null }))
+      setState((prev) => ({
+        ...prev,
+        connectionStatus: "connecting",
+        error: null,
+      }));
 
-      if (!window.ethereum) {
-        throw new Error("MetaMask not installed. Please install MetaMask browser extension.")
+      if (!isClient || !window.ethereum) {
+        throw new Error(
+          "MetaMask not installed. Please install MetaMask browser extension."
+        );
       }
 
       // Add timeout to prevent hanging
-      const timeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Connection timeout - please try again")), 15000)
-      )
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Connection timeout - please try again")),
+          15000
+        )
+      );
 
       // Request account access with timeout
       const accountsPromise = window.ethereum.request({
         method: "eth_requestAccounts",
-      })
+      });
 
-      const accounts = await Promise.race([accountsPromise, timeout])
+      const accounts = await Promise.race([accountsPromise, timeout]);
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found - please unlock MetaMask")
+        throw new Error("No accounts found - please unlock MetaMask");
       }
 
       // Switch to Flare Network (Chain ID: 14)
@@ -98,7 +127,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: "0xe" }], // 14 in hex
-        })
+        });
       } catch (switchError: any) {
         // If network doesn't exist, add it
         if (switchError.code === 4902) {
@@ -117,7 +146,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
                 blockExplorerUrls: ["https://flare-explorer.flare.network/"],
               },
             ],
-          })
+          });
         }
       }
 
@@ -125,10 +154,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const balancePromise = window.ethereum.request({
         method: "eth_getBalance",
         params: [accounts[0], "latest"],
-      })
+      });
 
-      const balance = await Promise.race([balancePromise, timeout])
-      const balanceInEth = (Number.parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4)
+      const balance = await Promise.race([balancePromise, timeout]);
+      const balanceInEth = (
+        Number.parseInt(balance, 16) / Math.pow(10, 18)
+      ).toFixed(4);
 
       setState((prev) => ({
         ...prev,
@@ -139,56 +170,67 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         connectionStatus: "connected",
         isConnected: true,
         flareWallet: { address: accounts[0], balance: balanceInEth },
-      }))
+      }));
     } catch (error: any) {
       setState((prev) => ({
         ...prev,
         connectionStatus: "error",
         error: error.message || "Failed to connect MetaMask",
-      }))
+      }));
     }
-  }
+  };
 
   // Gem Wallet connection
   const connectGemWallet = async () => {
     try {
-      setState((prev) => ({ ...prev, connectionStatus: "connecting", error: null }))
+      setState((prev) => ({
+        ...prev,
+        connectionStatus: "connecting",
+        error: null,
+      }));
 
       // Check if Gem Wallet is installed
-      if (!window.gemWallet) {
-        throw new Error("Gem Wallet not installed. Please install the Gem Wallet browser extension.")
+      if (!isClient || !window.gemWallet) {
+        throw new Error(
+          "Gem Wallet not installed. Please install the Gem Wallet browser extension."
+        );
       }
 
       // Add timeout to prevent hanging
-      const timeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Connection timeout - please try again")), 15000)
-      )
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Connection timeout - please try again")),
+          15000
+        )
+      );
 
       // Request connection with timeout
       const responsePromise = window.gemWallet.request({
         method: "wallet_requestPermissions",
         params: [{ wallet_selection: { network: "XRPL" } }],
-      })
+      });
 
-      const response = await Promise.race([responsePromise, timeout])
+      const response = await Promise.race([responsePromise, timeout]);
 
       if (!response || !response.result) {
-        throw new Error("Connection rejected or failed")
+        throw new Error("Connection rejected or failed");
       }
 
       // Get account info with timeout
       const accountInfoPromise = window.gemWallet.request({
         method: "account_info",
         params: {},
-      })
+      });
 
-      const accountInfo = await Promise.race([accountInfoPromise, timeout])
+      const accountInfo = await Promise.race([accountInfoPromise, timeout]);
 
       if (!accountInfo || !accountInfo.account) {
-        throw new Error("Failed to get account information")
+        throw new Error("Failed to get account information");
       }
 
-      const xrpBalance = accountInfo.balance ? (accountInfo.balance / 1000000).toFixed(2) : "0.00"
+      const xrpBalance = accountInfo.balance
+        ? (accountInfo.balance / 1000000).toFixed(2)
+        : "0.00";
 
       setState((prev) => ({
         ...prev,
@@ -199,20 +241,24 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         connectionStatus: "connected",
         isConnected: true,
         xrplWallet: { address: accountInfo.account, balance: xrpBalance },
-      }))
+      }));
     } catch (error: any) {
       setState((prev) => ({
         ...prev,
         connectionStatus: "error",
         error: error.message || "Failed to connect Gem Wallet",
-      }))
+      }));
     }
-  }
+  };
 
-  const sendXRPPayment = async (amount: number, destination: string, memo?: string): Promise<string> => {
+  const sendXRPPayment = async (
+    amount: number,
+    destination: string,
+    memo?: string
+  ): Promise<string> => {
     try {
-      if (!window.gemWallet || !state.gemConnected) {
-        throw new Error("Gem Wallet not connected")
+      if (!isClient || !window.gemWallet || !state.gemConnected) {
+        throw new Error("Gem Wallet not connected");
       }
 
       const payment = {
@@ -221,31 +267,34 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         Destination: destination,
         Amount: (amount * 1000000).toString(), // Convert XRP to drops
         Fee: "12", // Standard fee in drops
-        ...(memo && { Memos: [{ Memo: { MemoData: Buffer.from(memo).toString("hex") } }] }),
-      }
+        ...(memo && {
+          Memos: [{ Memo: { MemoData: Buffer.from(memo).toString("hex") } }],
+        }),
+      };
 
       const response = await window.gemWallet.request({
         method: "submit_transaction",
         params: { transaction: payment },
-      })
+      });
 
-      console.log("[v0] XRPL payment submitted:", response.result.hash)
-      return response.result.hash
+      console.log("[v0] XRPL payment submitted:", response.result.hash);
+      return response.result.hash;
     } catch (error: any) {
-      console.error("[v0] XRPL payment failed:", error)
-      throw error
+      console.error("[v0] XRPL payment failed:", error);
+      throw error;
     }
-  }
+  };
 
   const stakeFlare = async (amount: number): Promise<string> => {
     try {
-      if (!window.ethereum || !state.metamaskConnected) {
-        throw new Error("MetaMask not connected")
+      if (!isClient || !window.ethereum || !state.metamaskConnected) {
+        throw new Error("MetaMask not connected");
       }
 
       // Mock staking contract interaction
-      const stakingContractAddress = "0x1234567890123456789012345678901234567890" // Mock address
-      const amountInWei = (amount * Math.pow(10, 18)).toString(16)
+      const stakingContractAddress =
+        "0x1234567890123456789012345678901234567890"; // Mock address
+      const amountInWei = (amount * Math.pow(10, 18)).toString(16);
 
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
@@ -257,25 +306,26 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             data: "0xa694fc3a", // Mock stake() function selector
           },
         ],
-      })
+      });
 
-      console.log("[v0] Flare staking transaction:", txHash)
-      return txHash
+      console.log("[v0] Flare staking transaction:", txHash);
+      return txHash;
     } catch (error: any) {
-      console.error("[v0] Flare staking failed:", error)
-      throw error
+      console.error("[v0] Flare staking failed:", error);
+      throw error;
     }
-  }
+  };
 
   const unstakeFlare = async (amount: number): Promise<string> => {
     try {
-      if (!window.ethereum || !state.metamaskConnected) {
-        throw new Error("MetaMask not connected")
+      if (!isClient || !window.ethereum || !state.metamaskConnected) {
+        throw new Error("MetaMask not connected");
       }
 
       // Mock unstaking contract interaction
-      const stakingContractAddress = "0x1234567890123456789012345678901234567890"
-      const amountInWei = (amount * Math.pow(10, 18)).toString(16)
+      const stakingContractAddress =
+        "0x1234567890123456789012345678901234567890";
+      const amountInWei = (amount * Math.pow(10, 18)).toString(16);
 
       const txHash = await window.ethereum.request({
         method: "eth_sendTransaction",
@@ -286,31 +336,31 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             data: `0x2e1a7d4d${amountInWei.padStart(64, "0")}`, // Mock withdraw(uint256) function
           },
         ],
-      })
+      });
 
-      console.log("[v0] Flare unstaking transaction:", txHash)
-      return txHash
+      console.log("[v0] Flare unstaking transaction:", txHash);
+      return txHash;
     } catch (error: any) {
-      console.error("[v0] Flare unstaking failed:", error)
-      throw error
+      console.error("[v0] Flare unstaking failed:", error);
+      throw error;
     }
-  }
+  };
 
   const getStakingRewards = async (): Promise<number> => {
     try {
       if (!state.metamaskConnected) {
-        return 0
+        return 0;
       }
 
       // Mock rewards calculation - in real app this would query the staking contract
-      const mockRewards = Math.random() * 50 + 10 // Random rewards between 10-60 FLR
-      console.log("[v0] Fetched staking rewards:", mockRewards)
-      return mockRewards
+      const mockRewards = Math.random() * 50 + 10; // Random rewards between 10-60 FLR
+      console.log("[v0] Fetched staking rewards:", mockRewards);
+      return mockRewards;
     } catch (error: any) {
-      console.error("[v0] Failed to get staking rewards:", error)
-      return 0
+      console.error("[v0] Failed to get staking rewards:", error);
+      return 0;
     }
-  }
+  };
 
   // Disconnect wallet
   const disconnectWallet = (walletType: WalletType) => {
@@ -324,7 +374,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         activeWallet: prev.gemConnected ? "gem" : null,
         connectionStatus: prev.gemConnected ? "connected" : "disconnected",
         isConnected: prev.gemConnected,
-      }))
+      }));
     } else if (walletType === "gem") {
       setState((prev) => ({
         ...prev,
@@ -335,19 +385,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         activeWallet: prev.metamaskConnected ? "metamask" : null,
         connectionStatus: prev.metamaskConnected ? "connected" : "disconnected",
         isConnected: prev.metamaskConnected,
-      }))
+      }));
     }
-  }
+  };
 
   // Switch active wallet
   const switchWallet = (walletType: WalletType) => {
-    setState((prev) => ({ ...prev, activeWallet: walletType }))
-  }
+    setState((prev) => ({ ...prev, activeWallet: walletType }));
+  };
 
   // Clear error
   const clearError = () => {
-    setState((prev) => ({ ...prev, error: null }))
-  }
+    setState((prev) => ({ ...prev, error: null }));
+  };
 
   // Connection timeout reset
   useEffect(() => {
@@ -356,42 +406,47 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setState((prev) => ({
           ...prev,
           connectionStatus: "error",
-          error: "Connection timeout - please try again"
-        }))
-      }, 30000) // 30 second timeout
+          error: "Connection timeout - please try again",
+        }));
+      }, 30000); // 30 second timeout
 
-      return () => clearTimeout(timeout)
+      return () => clearTimeout(timeout);
     }
-  }, [state.connectionStatus])
+  }, [state.connectionStatus]);
 
   // Listen for account changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ethereum) {
+    if (isClient && window.ethereum) {
       const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length === 0) {
-          disconnectWallet("metamask")
+          disconnectWallet("metamask");
         } else if (state.metamaskConnected) {
           setState((prev) => ({
             ...prev,
             metamaskAddress: accounts[0],
-            flareWallet: prev.flareWallet ? { ...prev.flareWallet, address: accounts[0] } : null,
-          }))
+            flareWallet: prev.flareWallet
+              ? { ...prev.flareWallet, address: accounts[0] }
+              : null,
+          }));
         }
-      }
+      };
 
       const handleChainChanged = () => {
-        window.location.reload()
-      }
+        window.location.reload();
+      };
 
-      window.ethereum.on("accountsChanged", handleAccountsChanged)
-      window.ethereum.on("chainChanged", handleChainChanged)
+      window.ethereum.on("accountsChanged", handleAccountsChanged);
+      window.ethereum.on("chainChanged", handleChainChanged);
 
       return () => {
-        window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
-        window.ethereum.removeListener("chainChanged", handleChainChanged)
-      }
+        window.ethereum.removeListener(
+          "accountsChanged",
+          handleAccountsChanged
+        );
+        window.ethereum.removeListener("chainChanged", handleChainChanged);
+      };
     }
-  }, [state.metamaskConnected])
+  }, [isClient, state.metamaskConnected]);
 
   const contextValue: WalletContextType = {
     ...state,
@@ -404,24 +459,28 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     stakeFlare,
     unstakeFlare,
     getStakingRewards,
-  }
+  };
 
-  return <WalletContext.Provider value={contextValue}>{children}</WalletContext.Provider>
+  return (
+    <WalletContext.Provider value={contextValue}>
+      {children}
+    </WalletContext.Provider>
+  );
 }
 
 // Hook to use wallet context
 export function useWallet() {
-  const context = useContext(WalletContext)
+  const context = useContext(WalletContext);
   if (context === undefined) {
-    throw new Error("useWallet must be used within a WalletProvider")
+    throw new Error("useWallet must be used within a WalletProvider");
   }
-  return context
+  return context;
 }
 
 // Type declarations for window objects
 declare global {
   interface Window {
-    ethereum?: any
-    gemWallet?: any
+    ethereum?: any;
+    gemWallet?: any;
   }
 }
