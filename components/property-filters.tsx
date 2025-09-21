@@ -42,10 +42,13 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
 
   const availableLocations = [
     "Maldives",
+    "Maldives, Indian Ocean",
     "Tokyo, Japan", 
     "Swiss Alps",
+    "Swiss Alps, Switzerland",
     "Barcelona, Spain",
     "Miami Beach, USA",
+    "Miami, FL",
     "Kyoto, Japan",
     "New York, NY",
     "Los Angeles, CA",
@@ -58,7 +61,10 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
     "San Diego, CA",
     "Portland, OR",
     "Las Vegas, NV",
-    "Philadelphia, PA"
+    "Philadelphia, PA",
+    "Malibu, CA",
+    "Aspen, CO",
+    "Zermatt, Switzerland"
   ]
 
   const propertyTypes = ["Apartment", "House", "Villa", "Condo", "Loft", "Studio"]

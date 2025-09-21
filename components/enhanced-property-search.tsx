@@ -22,6 +22,7 @@ import {
   Dumbbell,
   Shield,
   Coins,
+  ChevronDown,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -35,6 +36,34 @@ export function EnhancedPropertySearch() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
   const [propertyTypes, setPropertyTypes] = useState<string[]>([])
   const [currency, setCurrency] = useState<"XRP" | "FLR">("XRP")
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false)
+
+  const availableLocations = [
+    "Maldives",
+    "Maldives, Indian Ocean",
+    "Tokyo, Japan", 
+    "Swiss Alps",
+    "Swiss Alps, Switzerland",
+    "Barcelona, Spain",
+    "Miami Beach, USA",
+    "Miami, FL",
+    "Kyoto, Japan",
+    "New York, NY",
+    "Los Angeles, CA",
+    "San Francisco, CA",
+    "Chicago, IL",
+    "Boston, MA",
+    "Seattle, WA",
+    "Austin, TX",
+    "Denver, CO",
+    "San Diego, CA",
+    "Portland, OR",
+    "Las Vegas, NV",
+    "Philadelphia, PA",
+    "Malibu, CA",
+    "Aspen, CO",
+    "Zermatt, Switzerland"
+  ]
 
   const amenities = [
     { id: "wifi", label: "WiFi", icon: Wifi },
@@ -63,6 +92,15 @@ export function EnhancedPropertySearch() {
     }
   }
 
+  const selectLocation = (selectedLocation: string) => {
+    setLocation(selectedLocation)
+    setShowLocationDropdown(false)
+  }
+
+  const filteredLocations = availableLocations.filter(loc =>
+    loc.toLowerCase().includes(location.toLowerCase())
+  )
+
   return (
     <div className="space-y-6">
       {/* Main Search Bar */}
@@ -76,9 +114,35 @@ export function EnhancedPropertySearch() {
                 placeholder="Search destinations"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="pl-10"
+                onFocus={() => setShowLocationDropdown(true)}
+                onBlur={() => setTimeout(() => setShowLocationDropdown(false), 200)}
+                className="pl-10 pr-10"
               />
               <MapPin className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer" 
+                onClick={() => setShowLocationDropdown(!showLocationDropdown)} />
+              
+              {/* Location Dropdown */}
+              {showLocationDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {filteredLocations.length > 0 ? (
+                    filteredLocations.map((locationOption) => (
+                      <button
+                        key={locationOption}
+                        onClick={() => selectLocation(locationOption)}
+                        className="w-full px-4 py-2 text-left hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        {locationOption}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-muted-foreground text-sm">
+                      No locations found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
