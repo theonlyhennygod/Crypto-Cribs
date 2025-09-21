@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Search,
   MapPin,
@@ -22,19 +22,43 @@ import {
   Dumbbell,
   Shield,
   Coins,
-} from "lucide-react"
-import { useState } from "react"
+  ChevronDown,
+} from "lucide-react";
+import { useState } from "react";
 
 export function EnhancedPropertySearch() {
-  const [location, setLocation] = useState("")
-  const [checkIn, setCheckIn] = useState("")
-  const [checkOut, setCheckOut] = useState("")
-  const [guests, setGuests] = useState(2)
-  const [priceRange, setPriceRange] = useState([50, 500])
-  const [showFilters, setShowFilters] = useState(false)
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-  const [propertyTypes, setPropertyTypes] = useState<string[]>([])
-  const [currency, setCurrency] = useState<"XRP" | "FLR">("XRP")
+  const [location, setLocation] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState(2);
+  const [priceRange, setPriceRange] = useState([50, 500]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
+  const [currency, setCurrency] = useState<"XRP" | "FLR">("XRP");
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+
+  const availableLocations = [
+    "All Locations",
+    "Maldives",
+    "Tokyo, Japan",
+    "Swiss Alps",
+    "Barcelona, Spain",
+    "Miami Beach, USA",
+    "Kyoto, Japan",
+    "New York, NY",
+    "Los Angeles, CA",
+    "San Francisco, CA",
+    "Chicago, IL",
+    "Boston, MA",
+    "Seattle, WA",
+    "Austin, TX",
+    "Denver, CO",
+    "San Diego, CA",
+    "Portland, OR",
+    "Las Vegas, NV",
+    "Philadelphia, PA",
+  ];
 
   const amenities = [
     { id: "wifi", label: "WiFi", icon: Wifi },
@@ -43,32 +67,41 @@ export function EnhancedPropertySearch() {
     { id: "pool", label: "Pool", icon: Waves },
     { id: "gym", label: "Gym", icon: Dumbbell },
     { id: "verified", label: "Verified Host", icon: Shield },
-  ]
+  ];
 
-  const types = ["Entire place", "Private room", "Shared room", "Hotel room"]
+  const types = ["Entire place", "Private room", "Shared room", "Hotel room"];
 
   const handleAmenityChange = (amenityId: string, checked: boolean) => {
     if (checked) {
-      setSelectedAmenities([...selectedAmenities, amenityId])
+      setSelectedAmenities([...selectedAmenities, amenityId]);
     } else {
-      setSelectedAmenities(selectedAmenities.filter((id) => id !== amenityId))
+      setSelectedAmenities(selectedAmenities.filter((id) => id !== amenityId));
     }
-  }
+  };
 
   const handlePropertyTypeChange = (type: string, checked: boolean) => {
     if (checked) {
-      setPropertyTypes([...propertyTypes, type])
+      setPropertyTypes([...propertyTypes, type]);
     } else {
-      setPropertyTypes(propertyTypes.filter((t) => t !== type))
+      setPropertyTypes(propertyTypes.filter((t) => t !== type));
     }
-  }
+  };
+
+  const selectLocation = (selectedLocation: string) => {
+    setLocation(selectedLocation === "All Locations" ? "" : selectedLocation);
+    setShowLocationDropdown(false);
+  };
+
+  const filteredLocations = availableLocations.filter((loc) =>
+    loc.toLowerCase().includes(location.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
       {/* Main Search Bar */}
-      <Card className="p-6">
+      <Card className="p-6 relative" style={{ zIndex: 100000 }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-1">
+          <div className="md:col-span-1 relative" style={{ zIndex: 100000 }}>
             <Label htmlFor="location">Where</Label>
             <div className="relative">
               <Input
@@ -76,9 +109,44 @@ export function EnhancedPropertySearch() {
                 placeholder="Search destinations"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="pl-10"
+                onFocus={() => setShowLocationDropdown(true)}
+                onBlur={() =>
+                  setTimeout(() => setShowLocationDropdown(false), 200)
+                }
+                className="pl-10 pr-10"
               />
               <MapPin className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <ChevronDown
+                className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+                onClick={() => setShowLocationDropdown(!showLocationDropdown)}
+              />
+
+              {/* Location Dropdown */}
+              {showLocationDropdown && (
+                <div
+                  className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-xl z-[99999] max-h-60 overflow-y-auto"
+                  style={{
+                    zIndex: 99999,
+                  }}
+                >
+                  {filteredLocations.length > 0 ? (
+                    filteredLocations.map((locationOption) => (
+                      <button
+                        key={locationOption}
+                        onClick={() => selectLocation(locationOption)}
+                        className="w-full px-4 py-2 text-left hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        {locationOption}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-muted-foreground text-sm">
+                      No locations found
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -128,7 +196,11 @@ export function EnhancedPropertySearch() {
         </div>
 
         <div className="flex items-center justify-between mt-6">
-          <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2"
+          >
             <SlidersHorizontal className="h-4 w-4" />
             Filters
             {(selectedAmenities.length > 0 || propertyTypes.length > 0) && (
@@ -156,7 +228,9 @@ export function EnhancedPropertySearch() {
             <div className="space-y-6">
               {/* Currency Selection */}
               <div>
-                <Label className="text-base font-semibold">Payment Currency</Label>
+                <Label className="text-base font-semibold">
+                  Payment Currency
+                </Label>
                 <div className="flex gap-4 mt-3">
                   <Button
                     variant={currency === "XRP" ? "default" : "outline"}
@@ -181,7 +255,9 @@ export function EnhancedPropertySearch() {
 
               {/* Price Range */}
               <div>
-                <Label className="text-base font-semibold">Price Range ({currency}) per night</Label>
+                <Label className="text-base font-semibold">
+                  Price Range ({currency}) per night
+                </Label>
                 <div className="mt-4 px-3">
                   <Slider
                     value={priceRange}
@@ -213,7 +289,9 @@ export function EnhancedPropertySearch() {
                       <Checkbox
                         id={type}
                         checked={propertyTypes.includes(type)}
-                        onCheckedChange={(checked) => handlePropertyTypeChange(type, checked as boolean)}
+                        onCheckedChange={(checked) =>
+                          handlePropertyTypeChange(type, checked as boolean)
+                        }
                       />
                       <Label htmlFor={type} className="text-sm font-normal">
                         {type}
@@ -230,20 +308,28 @@ export function EnhancedPropertySearch() {
                 <Label className="text-base font-semibold">Amenities</Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
                   {amenities.map((amenity) => {
-                    const Icon = amenity.icon
+                    const Icon = amenity.icon;
                     return (
-                      <div key={amenity.id} className="flex items-center space-x-2">
+                      <div
+                        key={amenity.id}
+                        className="flex items-center space-x-2"
+                      >
                         <Checkbox
                           id={amenity.id}
                           checked={selectedAmenities.includes(amenity.id)}
-                          onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)}
+                          onCheckedChange={(checked) =>
+                            handleAmenityChange(amenity.id, checked as boolean)
+                          }
                         />
-                        <Label htmlFor={amenity.id} className="text-sm font-normal flex items-center gap-2">
+                        <Label
+                          htmlFor={amenity.id}
+                          className="text-sm font-normal flex items-center gap-2"
+                        >
                           <Icon className="h-4 w-4" />
                           {amenity.label}
                         </Label>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -253,20 +339,22 @@ export function EnhancedPropertySearch() {
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    setSelectedAmenities([])
-                    setPropertyTypes([])
-                    setPriceRange([50, 500])
-                    setCurrency("XRP")
+                    setSelectedAmenities([]);
+                    setPropertyTypes([]);
+                    setPriceRange([50, 500]);
+                    setCurrency("XRP");
                   }}
                 >
                   Clear all
                 </Button>
-                <Button className="bg-primary hover:bg-primary/90">Apply Filters</Button>
+                <Button className="bg-primary hover:bg-primary/90">
+                  Apply Filters
+                </Button>
               </div>
             </div>
           </Card>
         </motion.div>
       )}
     </div>
-  )
+  );
 }

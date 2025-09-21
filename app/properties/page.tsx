@@ -1,21 +1,27 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { motion } from "framer-motion"
-import { Navigation } from "@/components/navigation"
-import { PropertyCard } from "@/components/property-card"
-import { PropertyFilters } from "@/components/property-filters"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { 
-  Grid, 
-  List, 
-  Search, 
-  MapPin, 
+import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { Navigation } from "@/components/navigation";
+import { PropertyCard } from "@/components/property-card";
+import { PropertyFilters } from "@/components/property-filters";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Grid,
+  List,
+  Search,
+  MapPin,
   Calendar,
   Users,
   Filter,
@@ -23,14 +29,14 @@ import {
   ArrowUpDown,
   ChevronDown,
   Star,
-  Coins
-} from "lucide-react"
+  Coins,
+} from "lucide-react";
 
-// Extended mock property data
+// Complete mock property data - 18 properties
 const mockProperties = [
   {
     id: "1",
-    title: "Luxury Beachfront Villa",
+    title: "Luxury Beachfront Villa with Private Pool",
     location: "Maldives",
     price: 450,
     originalPrice: 650,
@@ -40,19 +46,21 @@ const mockProperties = [
     guests: 8,
     bedrooms: 4,
     bathrooms: 3,
-    images: ["/luxury-beachfront-villa-maldives.jpg", "/villa-pool-maldives.jpg", "/villa-bedroom-luxury.jpg"],
+    images: [
+      "/luxury-beachfront-villa-maldives.jpg",
+      "/villa-pool-maldives.jpg",
+      "/villa-bedroom-luxury.jpg",
+    ],
     amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Air conditioning"],
     host: "Sarah Chen",
     hostWallet: "0x1234567890abcdef1234567890abcdef12345678",
     isVerified: true,
     discount: 30,
     instantBook: true,
-    tags: ["Beachfront", "Luxury", "Family-Friendly"],
-    coordinates: { lat: 3.2028, lng: 73.2207 }
   },
   {
     id: "2",
-    title: "Modern Downtown Loft",
+    title: "Modern Downtown Loft with City Views",
     location: "Tokyo, Japan",
     price: 180,
     originalPrice: 280,
@@ -62,19 +70,21 @@ const mockProperties = [
     guests: 4,
     bedrooms: 2,
     bathrooms: 2,
-    images: ["/modern-loft-tokyo-city-view.jpg", "/loft-interior-modern.jpg", "/tokyo-skyline-view.jpg"],
+    images: [
+      "/modern-loft-tokyo-city-view.jpg",
+      "/loft-interior-modern.jpg",
+      "/tokyo-skyline-view.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Gym", "Air conditioning"],
     host: "Kenji Tanaka",
     hostWallet: "0x2345678901bcdef1234567890abcdef12345679",
     isVerified: true,
     discount: 35,
     instantBook: false,
-    tags: ["City", "Modern", "Business Travel"],
-    coordinates: { lat: 35.6762, lng: 139.6503 }
   },
   {
     id: "3",
-    title: "Mountain Cabin Retreat",
+    title: "Cozy Mountain Cabin with Hot Tub",
     location: "Swiss Alps",
     price: 320,
     originalPrice: 480,
@@ -84,19 +94,21 @@ const mockProperties = [
     guests: 6,
     bedrooms: 3,
     bathrooms: 2,
-    images: ["/mountain-cabin-swiss-alps.jpg", "/cabin-hot-tub-mountains.jpg", "/cozy-cabin-interior.png"],
+    images: [
+      "/mountain-cabin-swiss-alps.jpg",
+      "/cabin-hot-tub-mountains.jpg",
+      "/cozy-cabin-interior.png",
+    ],
     amenities: ["WiFi", "Kitchen", "Heating", "Hot Tub"],
     host: "Hans Mueller",
     hostWallet: "0x3456789012cdef1234567890abcdef1234567a",
     isVerified: true,
     discount: 33,
     instantBook: true,
-    tags: ["Mountain", "Cozy", "Hot Tub"],
-    coordinates: { lat: 46.2044, lng: 6.1432 }
   },
   {
     id: "4",
-    title: "Historic District Studio",
+    title: "Stylish Studio in Historic District",
     location: "Barcelona, Spain",
     price: 95,
     originalPrice: 140,
@@ -106,19 +118,21 @@ const mockProperties = [
     guests: 2,
     bedrooms: 1,
     bathrooms: 1,
-    images: ["/stylish-studio-barcelona-historic.jpg", "/barcelona-apartment-interior.jpg", "/historic-district-barcelona.jpg"],
+    images: [
+      "/stylish-studio-barcelona-historic.jpg",
+      "/barcelona-apartment-interior.jpg",
+      "/historic-district-barcelona.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Air conditioning"],
     host: "Maria Rodriguez",
     hostWallet: "0x456789013def1234567890abcdef1234567ab",
     isVerified: false,
     discount: 32,
     instantBook: false,
-    tags: ["Historic", "Studio", "City Center"],
-    coordinates: { lat: 41.3851, lng: 2.1734 }
   },
   {
     id: "5",
-    title: "Oceanfront Penthouse",
+    title: "Oceanfront Penthouse with Infinity Pool",
     location: "Miami Beach, USA",
     price: 680,
     originalPrice: 950,
@@ -128,19 +142,28 @@ const mockProperties = [
     guests: 10,
     bedrooms: 5,
     bathrooms: 4,
-    images: ["/oceanfront-penthouse-miami-beach.jpg", "/infinity-pool-ocean-view.png", "/luxury-penthouse-interior.png"],
-    amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Gym", "Air conditioning"],
+    images: [
+      "/oceanfront-penthouse-miami-beach.jpg",
+      "/infinity-pool-ocean-view.png",
+      "/luxury-penthouse-interior.png",
+    ],
+    amenities: [
+      "WiFi",
+      "Pool",
+      "Kitchen",
+      "Parking",
+      "Gym",
+      "Air conditioning",
+    ],
     host: "David Johnson",
     hostWallet: "0x56789014ef1234567890abcdef1234567abc",
     isVerified: true,
     discount: 28,
     instantBook: true,
-    tags: ["Oceanfront", "Luxury", "Penthouse"],
-    coordinates: { lat: 25.7617, lng: -80.1918 }
   },
   {
     id: "6",
-    title: "Traditional Japanese Ryokan",
+    title: "Traditional Ryokan with Garden Views",
     location: "Kyoto, Japan",
     price: 240,
     originalPrice: 350,
@@ -150,19 +173,21 @@ const mockProperties = [
     guests: 4,
     bedrooms: 2,
     bathrooms: 1,
-    images: ["/traditional-ryokan-kyoto-garden.jpg", "/japanese-garden-ryokan.jpg", "/traditional-japanese-room.jpg"],
+    images: [
+      "/traditional-ryokan-kyoto-garden.jpg",
+      "/japanese-garden-ryokan.jpg",
+      "/traditional-japanese-room.jpg",
+    ],
     amenities: ["WiFi", "Kitchen", "Garden", "Traditional Bath"],
     host: "Yuki Sato",
     hostWallet: "0x6789015f1234567890abcdef1234567abcd",
     isVerified: true,
     discount: 31,
     instantBook: false,
-    tags: ["Traditional", "Garden", "Cultural"],
-    coordinates: { lat: 35.0116, lng: 135.7681 }
   },
   {
     id: "7",
-    title: "Desert Luxury Resort",
+    title: "Desert Luxury Resort Villa",
     location: "Dubai, UAE",
     price: 520,
     originalPrice: 750,
@@ -172,15 +197,13 @@ const mockProperties = [
     guests: 6,
     bedrooms: 3,
     bathrooms: 3,
-    images: ["/desert-oasis-resort-dubai.jpg", "/luxury-spa-desert.jpg", "/dubai-skyline-resort.jpg"],
-    amenities: ["WiFi", "Pool", "Spa", "Kitchen", "Parking", "Air conditioning"],
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Pool", "Kitchen", "Parking", "Air conditioning"],
     host: "Ahmed Al-Mansouri",
     hostWallet: "0x789016f1234567890abcdef1234567abcde",
     isVerified: true,
     discount: 30,
     instantBook: true,
-    tags: ["Desert", "Luxury", "Spa"],
-    coordinates: { lat: 25.2048, lng: 55.2708 }
   },
   {
     id: "8",
@@ -194,195 +217,419 @@ const mockProperties = [
     guests: 4,
     bedrooms: 2,
     bathrooms: 1,
-    images: ["/charming-cottage-cotswolds.jpg", "/english-countryside-cottage.jpg", "/cozy-cottage-interior.jpg"],
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
     amenities: ["WiFi", "Kitchen", "Garden", "Fireplace"],
     host: "Emma Thompson",
     hostWallet: "0x89017f1234567890abcdef1234567abcdef",
     isVerified: true,
     discount: 27,
     instantBook: false,
-    tags: ["Countryside", "Charming", "Historic"],
-    coordinates: { lat: 51.8330, lng: -1.8433 }
-  }
-]
+  },
+  {
+    id: "9",
+    title: "Scandinavian Lakeside Cabin",
+    location: "Stockholm, Sweden",
+    price: 220,
+    originalPrice: 310,
+    currency: "XRP" as const,
+    rating: 4.6,
+    reviews: 112,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 2,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Kitchen", "Heating", "Sauna"],
+    host: "Erik Lindqvist",
+    hostWallet: "0x90128f1234567890abcdef1234567abcdef0",
+    isVerified: true,
+    discount: 29,
+    instantBook: true,
+  },
+  {
+    id: "10",
+    title: "Moroccan Riad with Rooftop Terrace",
+    location: "Marrakech, Morocco",
+    price: 140,
+    originalPrice: 200,
+    currency: "FLR" as const,
+    rating: 4.4,
+    reviews: 98,
+    guests: 8,
+    bedrooms: 4,
+    bathrooms: 2,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Kitchen", "Air conditioning", "Terrace"],
+    host: "Amina Benali",
+    hostWallet: "0xa1239f1234567890abcdef1234567abcdef01",
+    isVerified: true,
+    discount: 30,
+    instantBook: false,
+  },
+  {
+    id: "11",
+    title: "Australian Outback Lodge",
+    location: "Uluru, Australia",
+    price: 380,
+    originalPrice: 520,
+    currency: "XRP" as const,
+    rating: 4.8,
+    reviews: 76,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Kitchen", "Air conditioning", "Stargazing"],
+    host: "Jack Thompson",
+    hostWallet: "0xb234af1234567890abcdef1234567abcdef02",
+    isVerified: true,
+    discount: 27,
+    instantBook: true,
+  },
+  {
+    id: "12",
+    title: "Tuscan Vineyard Villa",
+    location: "Tuscany, Italy",
+    price: 420,
+    originalPrice: 600,
+    currency: "FLR" as const,
+    rating: 4.9,
+    reviews: 145,
+    guests: 8,
+    bedrooms: 4,
+    bathrooms: 3,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Pool", "Kitchen", "Garden", "Wine Cellar"],
+    host: "Giuseppe Rossi",
+    hostWallet: "0xc345bf1234567890abcdef1234567abcdef03",
+    isVerified: true,
+    discount: 30,
+    instantBook: false,
+  },
+  {
+    id: "13",
+    title: "Icelandic Glass Igloo",
+    location: "Reykjavik, Iceland",
+    price: 350,
+    originalPrice: 480,
+    currency: "XRP" as const,
+    rating: 4.7,
+    reviews: 89,
+    guests: 2,
+    bedrooms: 1,
+    bathrooms: 1,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Heating", "Northern Lights View"],
+    host: "Björk Sigurdsson",
+    hostWallet: "0xd456cf1234567890abcdef1234567abcdef04",
+    isVerified: true,
+    discount: 27,
+    instantBook: true,
+  },
+  {
+    id: "14",
+    title: "Balinese Treehouse Retreat",
+    location: "Ubud, Bali",
+    price: 180,
+    originalPrice: 250,
+    currency: "FLR" as const,
+    rating: 4.6,
+    reviews: 123,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 1,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Kitchen", "Garden", "Yoga Platform"],
+    host: "Made Wijaya",
+    hostWallet: "0xe567df1234567890abcdef1234567abcdef05",
+    isVerified: true,
+    discount: 28,
+    instantBook: false,
+  },
+  {
+    id: "15",
+    title: "Canadian Mountain Chalet",
+    location: "Banff, Canada",
+    price: 290,
+    originalPrice: 420,
+    currency: "XRP" as const,
+    rating: 4.8,
+    reviews: 167,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 2,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Kitchen", "Heating", "Fireplace", "Ski Access"],
+    host: "Sarah MacDonald",
+    hostWallet: "0xf678ef1234567890abcdef1234567abcdef06",
+    isVerified: true,
+    discount: 31,
+    instantBook: true,
+  },
+  {
+    id: "16",
+    title: "Greek Island Villa",
+    location: "Santorini, Greece",
+    price: 480,
+    originalPrice: 680,
+    currency: "FLR" as const,
+    rating: 4.9,
+    reviews: 201,
+    guests: 6,
+    bedrooms: 3,
+    bathrooms: 2,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Pool", "Kitchen", "Sea View"],
+    host: "Dimitris Papadopoulos",
+    hostWallet: "0x0789ff1234567890abcdef1234567abcdef07",
+    isVerified: true,
+    discount: 29,
+    instantBook: false,
+  },
+  {
+    id: "17",
+    title: "New Zealand Coastal Cabin",
+    location: "Queenstown, New Zealand",
+    price: 240,
+    originalPrice: 340,
+    currency: "XRP" as const,
+    rating: 4.7,
+    reviews: 134,
+    guests: 4,
+    bedrooms: 2,
+    bathrooms: 1,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Kitchen", "Heating", "Lake View"],
+    host: "Emma Wilson",
+    hostWallet: "0x189a0f1234567890abcdef1234567abcdef08",
+    isVerified: true,
+    discount: 29,
+    instantBook: true,
+  },
+  {
+    id: "18",
+    title: "Brazilian Beach House",
+    location: "Rio de Janeiro, Brazil",
+    price: 320,
+    originalPrice: 450,
+    currency: "FLR" as const,
+    rating: 4.5,
+    reviews: 156,
+    guests: 8,
+    bedrooms: 4,
+    bathrooms: 3,
+    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    amenities: ["WiFi", "Pool", "Kitchen", "Beach Access"],
+    host: "Carlos Silva",
+    hostWallet: "0x29ab1f1234567890abcdef1234567abcdef09",
+    isVerified: true,
+    discount: 29,
+    instantBook: false,
+  },
+];
 
 export default function PropertiesPage() {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState("recommended")
-  const [filters, setFilters] = useState({
-    priceRange: [0, 1000],
-    currency: "all",
-    guests: 1,
-    bedrooms: 0,
-    amenities: [] as string[],
-    instantBook: false,
-    verifiedOnly: false,
-    minRating: 0
-  })
-  const [showFilters, setShowFilters] = useState(false)
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState("recommended");
+  const [displayedCount, setDisplayedCount] = useState(9);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredProperties, setFilteredProperties] = useState(mockProperties);
 
-  // Filter and sort properties
-  const filteredAndSortedProperties = useMemo(() => {
-    let filtered = mockProperties.filter(property => {
-      // Search filter
-      if (searchQuery) {
-        const searchLower = searchQuery.toLowerCase()
-        const matchesSearch = property.title.toLowerCase().includes(searchLower) ||
-                            property.location.toLowerCase().includes(searchLower) ||
-                            property.tags.some(tag => tag.toLowerCase().includes(searchLower))
-        if (!matchesSearch) return false
-      }
+  const handleFiltersChange = (filters: any) => {
+    let filtered = [...mockProperties];
 
-      // Price filter
-      if (property.price < filters.priceRange[0] || property.price > filters.priceRange[1]) {
-        return false
-      }
-
-      // Currency filter
-      if (filters.currency !== "all" && property.currency !== filters.currency) {
-        return false
-      }
-
-      // Guests filter
-      if (property.guests < filters.guests) {
-        return false
-      }
-
-      // Bedrooms filter
-      if (filters.bedrooms > 0 && property.bedrooms < filters.bedrooms) {
-        return false
-      }
-
-      // Instant book filter
-      if (filters.instantBook && !property.instantBook) {
-        return false
-      }
-
-      // Verified only filter
-      if (filters.verifiedOnly && !property.isVerified) {
-        return false
-      }
-
-      // Rating filter
-      if (property.rating < filters.minRating) {
-        return false
-      }
-
-      return true
-    })
-
-    // Sort properties
-    switch (sortBy) {
-      case "price-low":
-        filtered.sort((a, b) => a.price - b.price)
-        break
-      case "price-high":
-        filtered.sort((a, b) => b.price - a.price)
-        break
-      case "rating":
-        filtered.sort((a, b) => b.rating - a.rating)
-        break
-      case "reviews":
-        filtered.sort((a, b) => b.reviews - a.reviews)
-        break
-      case "discount":
-        filtered.sort((a, b) => b.discount - a.discount)
-        break
-      default:
-        // Keep original order for "recommended"
-        break
+    // Filter by location
+    if (filters.location) {
+      filtered = filtered.filter((property) =>
+        property.location.toLowerCase().includes(filters.location.toLowerCase())
+      );
     }
 
-    return filtered
-  }, [searchQuery, filters, sortBy])
+    // Filter by price range
+    if (filters.priceRange) {
+      filtered = filtered.filter((property) => {
+        const price = property.price;
+        return price >= filters.priceRange[0] && price <= filters.priceRange[1];
+      });
+    }
 
-  const totalSavings = filteredAndSortedProperties.reduce((sum, property) => {
-    const savings = property.originalPrice ? property.originalPrice - property.price : 0
-    return sum + savings
-  }, 0)
+    // Filter by currency
+    if (filters.currency && filters.currency !== "both") {
+      filtered = filtered.filter(
+        (property) => property.currency === filters.currency
+      );
+    }
+
+    // Filter by property types
+    if (filters.propertyTypes && filters.propertyTypes.length > 0) {
+      filtered = filtered.filter((property) => {
+        return filters.propertyTypes.includes(property.propertyType);
+      });
+    }
+
+    // Filter by amenities
+    if (filters.amenities && filters.amenities.length > 0) {
+      filtered = filtered.filter((property) =>
+        filters.amenities.every((amenity: string) =>
+          property.amenities.some((propAmenity) =>
+            propAmenity.toLowerCase().includes(amenity.toLowerCase())
+          )
+        )
+      );
+    }
+
+    // Filter by guests
+    if (filters.guests) {
+      filtered = filtered.filter(
+        (property) => property.guests >= filters.guests
+      );
+    }
+
+    setFilteredProperties(filtered);
+    setDisplayedCount(9); // Reset to show first 9 properties when filters change
+  };
+
+  const handleLoadMore = () => {
+    setIsLoading(true);
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+      setDisplayedCount((prev) =>
+        Math.min(prev + 9, filteredProperties.length)
+      );
+      setIsLoading(false);
+    }, 500);
+  };
+
+  const sortProperties = (
+    properties: typeof mockProperties,
+    sortBy: string
+  ) => {
+    const sorted = [...properties];
+
+    switch (sortBy) {
+      case "price-low":
+        return sorted.sort((a, b) => a.price - b.price);
+      case "price-high":
+        return sorted.sort((a, b) => b.price - a.price);
+      case "rating":
+        return sorted.sort((a, b) => b.rating - a.rating);
+      case "reviews":
+        return sorted.sort((a, b) => b.reviews - a.reviews);
+      case "discount":
+        return sorted.sort((a, b) => (b.discount || 0) - (a.discount || 0));
+      case "newest":
+        // Sort by ID (assuming higher ID = newer property)
+        return sorted.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+      case "recommended":
+      default:
+        // Recommended: Mix of rating, reviews, and discount
+        return sorted.sort((a, b) => {
+          const scoreA =
+            a.rating * 0.4 +
+            (a.reviews / 100) * 0.3 +
+            ((a.discount || 0) / 100) * 0.3;
+          const scoreB =
+            b.rating * 0.4 +
+            (b.reviews / 100) * 0.3 +
+            ((b.discount || 0) / 100) * 0.3;
+          return scoreB - scoreA;
+        });
+    }
+  };
+
+  const sortedProperties = sortProperties(filteredProperties, sortBy);
+  const displayedProperties = sortedProperties.slice(0, displayedCount);
+  const hasMoreProperties = displayedCount < filteredProperties.length;
+
+  const setFilters = handleFiltersChange;
+
+  const totalSavings = filteredProperties.reduce((sum, property) => {
+    const savings = property.originalPrice
+      ? property.originalPrice - property.price
+      : 0;
+    return sum + savings;
+  }, 0);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="pt-20">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12">
+        <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-16">
           <div className="container mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center space-y-4"
+              className="text-center space-y-6"
             >
-              <h1 className="text-4xl md:text-5xl font-bold">Explore Properties</h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Discover unique accommodations worldwide with crypto payments and transparent pricing
+              <Badge
+                variant="outline"
+                className="mb-4 text-primary border-primary/20"
+              >
+                Property Listings
+              </Badge>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 text-balance">
+                Discover Amazing
+                <br />
+                <span className="text-primary">Places to Stay</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+                Browse verified properties with transparent pricing and save up
+                to 50% compared to traditional booking platforms.
               </p>
-              
-              {/* Search Bar */}
-              <div className="max-w-2xl mx-auto mt-8">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-                  <Input
-                    placeholder="Search by location, property name, or amenities..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 pr-4 py-6 text-lg"
-                  />
-                </div>
-              </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Filters and Controls */}
-        <div className="container mx-auto px-6 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            {/* Results Info */}
+        {/* Simple Filters */}
+        <div className="container mx-auto px-6 py-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-8"
+          >
+            <PropertyFilters onFiltersChange={setFilters} />
+          </motion.div>
+
+          {/* Results Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex items-center justify-between mb-8"
+          >
             <div className="flex items-center gap-4">
-              <div>
-                <p className="text-lg font-semibold">
-                  {filteredAndSortedProperties.length} properties found
-                </p>
-                {totalSavings > 0 && (
-                  <p className="text-sm text-green-600">
-                    Total savings: {totalSavings} crypto vs traditional platforms
-                  </p>
-                )}
-              </div>
+              <span className="text-lg font-semibold">
+                {displayedProperties.length} of {filteredProperties.length}{" "}
+                properties shown
+              </span>
+              <Badge
+                variant="secondary"
+                className="bg-green-500/10 text-green-500 border-green-500/20"
+              >
+                Total savings: {totalSavings} XRP/FLR
+              </Badge>
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-3">
-              {/* Filters Toggle */}
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className="gap-2"
+            <div className="flex items-center gap-4">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setDisplayedCount(9); // Reset to show first 9 properties when sorting changes
+                }}
+                className="bg-background border border-border rounded-lg px-3 py-2 text-sm"
               >
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </Button>
+                <option value="recommended">Recommended</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="reviews">Most Reviews</option>
+                <option value="newest">Newest</option>
+              </select>
 
-              {/* Sort */}
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recommended">Recommended</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="reviews">Most Reviews</SelectItem>
-                  <SelectItem value="discount">Best Discounts</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* View Mode */}
-              <div className="flex border rounded-lg">
+              <div className="flex items-center border border-border rounded-lg">
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
@@ -401,94 +648,61 @@ export default function PropertiesPage() {
                 </Button>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Filters Panel */}
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-6"
-            >
-              <Card>
-                <CardContent className="p-6">
-                  <PropertyFilters
-                    filters={filters}
-                    onFiltersChange={setFilters}
-                  />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Properties Grid/List */}
+          {/* Properties Grid */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className={`grid gap-8 ${
+              viewMode === "grid"
+                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-1"
+            }`}
           >
-            {filteredAndSortedProperties.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                  <MapPin className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">No properties found</h3>
-                <p className="text-muted-foreground mb-4">
-                  Try adjusting your search criteria or filters
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSearchQuery("")
-                    setFilters({
-                      priceRange: [0, 1000],
-                      currency: "all",
-                      guests: 1,
-                      bedrooms: 0,
-                      amenities: [],
-                      instantBook: false,
-                      verifiedOnly: false,
-                      minRating: 0
-                    })
-                  }}
-                >
-                  Clear all filters
-                </Button>
-              </div>
-            ) : (
-              <div className={
-                viewMode === "grid" 
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                  : "space-y-4"
-              }>
-                {filteredAndSortedProperties.map((property, index) => (
-                  <motion.div
-                    key={property.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <PropertyCard 
-                      property={property} 
-                      viewMode={viewMode}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            )}
+            {displayedProperties.map((property, index) => (
+              <motion.div
+                key={property.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <PropertyCard property={property} viewMode={viewMode} />
+              </motion.div>
+            ))}
           </motion.div>
 
-          {/* Load More Button (for pagination in real app) */}
-          {filteredAndSortedProperties.length > 0 && (
-            <div className="text-center mt-12">
-              <Button variant="outline" size="lg">
-                Load More Properties
+          {/* Load More */}
+          {hasMoreProperties && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="text-center mt-12"
+            >
+              <Button
+                variant="outline"
+                size="lg"
+                className="px-8 bg-transparent"
+                onClick={handleLoadMore}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                    Loading...
+                  </>
+                ) : (
+                  `Load More Properties (${
+                    filteredProperties.length - displayedCount
+                  } remaining)`
+                )}
               </Button>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }

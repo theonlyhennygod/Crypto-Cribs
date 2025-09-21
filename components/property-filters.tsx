@@ -1,190 +1,346 @@
-"use client"
+"use client";
 
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Star, Users, Home } from "lucide-react"
-
-interface FilterState {
-  priceRange: [number, number]
-  currency: string
-  guests: number
-  bedrooms: number
-  amenities: string[]
-  instantBook: boolean
-  verifiedOnly: boolean
-  minRating: number
-}
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import {
+  Search,
+  MapPin,
+  Users,
+  Home,
+  Sliders,
+  ChevronDown,
+  X,
+} from "lucide-react";
 
 interface PropertyFiltersProps {
-  filters?: FilterState
-  onFiltersChange: (filters: FilterState) => void
+  onFiltersChange?: (filters: any) => void;
 }
 
-export function PropertyFilters({ filters, onFiltersChange }: PropertyFiltersProps) {
-  const availableAmenities = [
+export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [filters, setFilters] = useState({
+    location: "",
+    priceRange: [0, 1000] as [number, number],
+    currency: "both",
+    propertyTypes: [] as string[],
+    amenities: [] as string[],
+    guests: 1,
+  });
+
+  const locations = [
+    "All Locations",
+    "Maldives",
+    "Tokyo, Japan",
+    "Swiss Alps",
+    "Barcelona, Spain",
+    "Miami Beach, USA",
+    "Kyoto, Japan",
+    "New York, NY",
+    "Los Angeles, CA",
+    "San Francisco, CA",
+    "Chicago, IL",
+    "Boston, MA",
+    "Seattle, WA",
+    "Austin, TX",
+    "Denver, CO",
+    "San Diego, CA",
+    "Portland, OR",
+    "Las Vegas, NV",
+    "Philadelphia, PA",
+  ];
+
+  const propertyTypes = [
+    "Villa",
+    "Loft",
+    "House",
+    "Studio",
+    "Condo",
+    "Apartment",
+  ];
+
+  const amenities = [
     "WiFi",
-    "Kitchen", 
-    "Parking",
     "Pool",
+    "Kitchen",
+    "Parking",
     "Gym",
     "Air conditioning",
     "Heating",
     "Hot Tub",
-    "Garden"
-  ]
+    "Garden",
+    "Beach Access",
+    "City View",
+    "Mountain View",
+    "Workspace",
+    "Traditional Bath",
+  ];
 
-  // Provide default values if filters is undefined
-  const safeFilters = filters || {
-    priceRange: [0, 1000] as [number, number],
-    currency: "all",
-    guests: 1,
-    bedrooms: 0,
-    amenities: [],
-    instantBook: false,
-    verifiedOnly: false,
-    minRating: 0
-  }
+  const updateFilters = (newFilters: Partial<typeof filters>) => {
+    const updated = { ...filters, ...newFilters };
+    setFilters(updated);
+    onFiltersChange?.(updated);
+  };
 
-  const updateFilters = (updates: Partial<FilterState>) => {
-    onFiltersChange({ ...safeFilters, ...updates })
-  }
+  const togglePropertyType = (type: string) => {
+    const newTypes = filters.propertyTypes.includes(type)
+      ? filters.propertyTypes.filter((t) => t !== type)
+      : [...filters.propertyTypes, type];
+    updateFilters({ propertyTypes: newTypes });
+  };
+
+  const toggleAmenity = (amenity: string) => {
+    const newAmenities = filters.amenities.includes(amenity)
+      ? filters.amenities.filter((a) => a !== amenity)
+      : [...filters.amenities, amenity];
+    updateFilters({ amenities: newAmenities });
+  };
+
+  const selectLocation = (location: string) => {
+    updateFilters({ location: location === "All Locations" ? "" : location });
+    setShowLocationDropdown(false);
+  };
+
+  const filteredLocations = locations.filter((location) =>
+    location.toLowerCase().includes(filters.location.toLowerCase())
+  );
+
+  const clearAllFilters = () => {
+    const clearedFilters = {
+      location: "",
+      priceRange: [0, 1000] as [number, number],
+      currency: "both",
+      propertyTypes: [] as string[],
+      amenities: [] as string[],
+      guests: 1,
+    };
+    setFilters(clearedFilters);
+    onFiltersChange?.(clearedFilters);
+  };
+
+  const hasActiveFilters =
+    filters.location ||
+    filters.priceRange[0] > 0 ||
+    filters.priceRange[1] < 1000 ||
+    filters.currency !== "both" ||
+    filters.propertyTypes.length > 0 ||
+    filters.amenities.length > 0 ||
+    filters.guests > 1;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {/* Price Range */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Price Range</Label>
-        <div className="px-3">
-          <Slider
-            value={safeFilters.priceRange}
-            onValueChange={(value) => updateFilters({ priceRange: value as [number, number] })}
-            max={1000}
-            min={0}
-            step={10}
-            className="w-full"
-          />
-        </div>
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>{safeFilters.priceRange[0]} crypto</span>
-          <span>{safeFilters.priceRange[1]} crypto</span>
-        </div>
-      </div>
+    <Card
+      className="bg-card/50 backdrop-blur border-border/50 relative"
+      style={{ zIndex: 100000 }}
+    >
+      <CardContent className="p-6">
+        {/* Main Search Row */}
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          {/* Location Search */}
+          <div className="flex-1 relative" style={{ zIndex: 100000 }}>
+            <div className="relative">
+              <MapPin className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search locations..."
+                value={filters.location}
+                onChange={(e) => updateFilters({ location: e.target.value })}
+                onFocus={() => setShowLocationDropdown(true)}
+                onBlur={() =>
+                  setTimeout(() => setShowLocationDropdown(false), 200)
+                }
+                className="pl-10 pr-10"
+              />
+              <ChevronDown
+                className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+                onClick={() => setShowLocationDropdown(!showLocationDropdown)}
+              />
 
-      {/* Currency */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Currency</Label>
-        <Select value={safeFilters.currency} onValueChange={(value) => updateFilters({ currency: value })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select currency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Currencies</SelectItem>
-            <SelectItem value="XRP">XRP Only</SelectItem>
-            <SelectItem value="FLR">FLR Only</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+              {/* Location Dropdown */}
+              {showLocationDropdown && (
+                <div
+                  className="fixed top-auto left-auto right-auto mt-1 bg-background border border-border rounded-md shadow-xl z-[99999] max-h-60 overflow-y-auto min-w-full"
+                  style={{
+                    position: "absolute",
+                    zIndex: 99999,
+                  }}
+                >
+                  {filteredLocations.length > 0 ? (
+                    filteredLocations.map((location) => (
+                      <button
+                        key={location}
+                        onClick={() => selectLocation(location)}
+                        className="w-full px-4 py-2 text-left hover:bg-muted transition-colors flex items-center gap-2"
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        {location}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-muted-foreground text-sm">
+                      No locations found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
 
-      {/* Guests */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Guests</Label>
-        <Select value={safeFilters.guests.toString()} onValueChange={(value) => updateFilters({ guests: parseInt(value) })}>
-          <SelectTrigger>
-            <Users className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {[1,2,3,4,5,6,7,8,9,10].map(num => (
-              <SelectItem key={num} value={num.toString()}>{num} {num === 1 ? 'Guest' : 'Guests'}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          {/* Guests */}
+          <div className="w-full md:w-48">
+            <Select
+              value={filters.guests.toString()}
+              onValueChange={(value) =>
+                updateFilters({ guests: parseInt(value) })
+              }
+            >
+              <SelectTrigger>
+                <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} {num === 1 ? "Guest" : "Guests"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* Bedrooms */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Bedrooms</Label>
-        <Select value={safeFilters.bedrooms.toString()} onValueChange={(value) => updateFilters({ bedrooms: parseInt(value) })}>
-          <SelectTrigger>
-            <Home className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="0">Any</SelectItem>
-            {[1,2,3,4,5].map(num => (
-              <SelectItem key={num} value={num.toString()}>{num}+ {num === 1 ? 'Bedroom' : 'Bedrooms'}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          {/* Advanced Filters Toggle */}
+          <Button
+            variant="outline"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="w-full md:w-auto"
+          >
+            <Sliders className="h-4 w-4 mr-2" />
+            Advanced
+            <ChevronDown
+              className={`h-4 w-4 ml-2 transition-transform ${
+                showAdvanced ? "rotate-180" : ""
+              }`}
+            />
+          </Button>
 
-      {/* Rating */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Minimum Rating</Label>
-        <div className="flex gap-1">
-          {[0, 3, 4, 4.5, 4.8].map((rating) => (
+          {/* Clear Filters */}
+          {hasActiveFilters && (
             <Button
-              key={rating}
-              variant={safeFilters.minRating === rating ? "default" : "outline"}
-              size="sm"
-              onClick={() => updateFilters({ minRating: rating })}
-              className="flex items-center gap-1"
+              variant="ghost"
+              onClick={clearAllFilters}
+              className="w-full md:w-auto"
             >
-              <Star className="h-3 w-3" />
-              {rating === 0 ? 'Any' : rating}
+              <X className="h-4 w-4 mr-2" />
+              Clear
             </Button>
-          ))}
+          )}
         </div>
-      </div>
 
-      {/* Quick Filters */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Quick Filters</Label>
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="instantBook"
-              checked={safeFilters.instantBook}
-              onCheckedChange={(checked) => updateFilters({ instantBook: !!checked })}
-            />
-            <Label htmlFor="instantBook" className="text-sm">Instant Book</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="verified"
-              checked={safeFilters.verifiedOnly}
-              onCheckedChange={(checked) => updateFilters({ verifiedOnly: !!checked })}
-            />
-            <Label htmlFor="verified" className="text-sm">Verified Hosts Only</Label>
-          </div>
-        </div>
-      </div>
+        {/* Advanced Filters */}
+        {showAdvanced && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6 pt-6 border-t border-border"
+          >
+            {/* Price Range */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">
+                  Price Range (per night)
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {filters.priceRange[0]} - {filters.priceRange[1]}{" "}
+                  {filters.currency === "both" ? "XRP/FLR" : filters.currency}
+                </span>
+              </div>
+              <Slider
+                value={filters.priceRange}
+                onValueChange={(value) =>
+                  updateFilters({ priceRange: value as [number, number] })
+                }
+                max={1000}
+                min={0}
+                step={10}
+                className="w-full"
+              />
+            </div>
 
-      {/* Amenities */}
-      <div className="space-y-3 md:col-span-2">
-        <Label className="text-sm font-medium">Amenities</Label>
-        <div className="flex flex-wrap gap-2">
-          {availableAmenities.map((amenity) => (
-            <Badge
-              key={amenity}
-              variant={safeFilters.amenities.includes(amenity) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => {
-                const newAmenities = safeFilters.amenities.includes(amenity)
-                  ? safeFilters.amenities.filter(a => a !== amenity)
-                  : [...safeFilters.amenities, amenity]
-                updateFilters({ amenities: newAmenities })
-              }}
-            >
-              {amenity}
-            </Badge>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
+            {/* Currency */}
+            <div className="space-y-3">
+              <span className="text-sm font-medium">Currency</span>
+              <div className="flex gap-2">
+                {["both", "XRP", "FLR"].map((currency) => (
+                  <Badge
+                    key={currency}
+                    variant={
+                      filters.currency === currency ? "default" : "outline"
+                    }
+                    className="cursor-pointer"
+                    onClick={() => updateFilters({ currency })}
+                  >
+                    {currency === "both" ? "Both" : currency}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Property Types */}
+            <div className="space-y-3">
+              <span className="text-sm font-medium">Property Type</span>
+              <div className="flex flex-wrap gap-2">
+                {propertyTypes.map((type) => (
+                  <Badge
+                    key={type}
+                    variant={
+                      filters.propertyTypes.includes(type)
+                        ? "default"
+                        : "outline"
+                    }
+                    className="cursor-pointer"
+                    onClick={() => togglePropertyType(type)}
+                  >
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Amenities */}
+            <div className="space-y-3">
+              <span className="text-sm font-medium">Amenities</span>
+              <div className="flex flex-wrap gap-2">
+                {amenities.map((amenity) => (
+                  <Badge
+                    key={amenity}
+                    variant={
+                      filters.amenities.includes(amenity)
+                        ? "default"
+                        : "outline"
+                    }
+                    className="cursor-pointer"
+                    onClick={() => toggleAmenity(amenity)}
+                  >
+                    {amenity}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
