@@ -1,0 +1,22 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.20"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
+remappings = [
+    "@flare-contracts/=lib/flare-smart-contracts/contracts/",
+    "@openzeppelin/=lib/openzeppelin-contracts/"
+]
+
+# Flare Network RPC endpoints
+[rpc_endpoints]
+flare = "https://flare-api.flare.network/ext/C/rpc"
+coston2 = "https://coston2-api.flare.network/ext/C/rpc"
+
+# Flare Network Chain IDs
+[etherscan]
+flare = { key = "${FLARESCAN_API_KEY}", chain = 14 }
+coston2 = { key = "${FLARESCAN_API_KEY}", chain = 114 }

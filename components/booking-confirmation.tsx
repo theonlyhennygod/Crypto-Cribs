@@ -23,9 +23,12 @@ interface BookingConfirmationProps {
     guests: number
     nights: number
     total: number
+    totalXRP?: number
     currency: "XRP" | "FLR"
     transactionHash: string
-    status: "confirmed" | "pending"
+    status: "confirmed" | "pending" | "pending_payment" | "payment_verified" | "active" | "completed" | "cancelled"
+    xrplAddress?: string
+    paymentVerified?: boolean
   }
 }
 
