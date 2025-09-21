@@ -220,11 +220,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         // Check if GemWallet is available
         if (typeof window !== 'undefined' && (window as any).gemWallet) {
           // Use GemWallet API directly to get real balance
-          const gemWalletApi = await import("@gemwallet/api");
-          
-          // Check if getBalance function exists
-          if (typeof gemWalletApi.getBalance === 'function') {
-            const balanceResponse = await gemWalletApi.getBalance();
+          try {
+            const balanceResponse = await getBalance();
             
             if (balanceResponse?.result && balanceResponse.result.balance) {
               const xrpBalance = balanceResponse.result.balance;
@@ -237,9 +234,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
               
               console.log("✅ Real GemWallet balance:", xrpBalance, "XRP");
               return; // Success, no need to try fallback
+            } else {
+              console.log("⚠️ Could not get balance from GemWallet API");
             }
-          } else {
-            console.log("⚠️ GemWallet getBalance function not available");
+          } catch (apiError) {
+            console.log("⚠️ GemWallet getBalance function failed:", apiError);
           }
         } else {
           console.log("⚠️ GemWallet not available in window");
@@ -286,7 +285,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       // Save to localStorage only in browser environment
       if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+          localStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify(newState));
           console.log("💾 Wallet state saved:", newState);
         } catch (error) {
           console.warn("Failed to save wallet state to localStorage:", error);
