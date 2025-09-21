@@ -25,8 +25,12 @@ import {
 import { Navigation } from "@/components/navigation"
 import { ListPropertyModal } from "@/components/list-property-modal"
 import { FraudPreventionDashboard } from "@/components/fraud-prevention-dashboard"
+import { useState } from "react"
 
 export default function HostDashboard() {
+  const [hoveredRating, setHoveredRating] = useState({});
+  const [selectedRating, setSelectedRating] = useState({});
+
   const stats = [
     {
       title: "Total Properties",
@@ -69,6 +73,7 @@ export default function HostDashboard() {
       bookings: 12,
       rating: 4.9,
       image: "/luxury-beachfront-villa.png",
+      userRating: 0,
     },
     {
       id: 2,
@@ -80,6 +85,7 @@ export default function HostDashboard() {
       bookings: 8,
       rating: 4.7,
       image: "/modern-penthouse.png",
+      userRating: 0,
     },
     {
       id: 3,
@@ -91,6 +97,7 @@ export default function HostDashboard() {
       bookings: 15,
       rating: 4.8,
       image: "/mountain-cabin-retreat.png",
+      userRating: 0,
     },
   ]
 
@@ -120,6 +127,15 @@ export default function HostDashboard() {
       status: "confirmed",
     },
   ]
+
+  const handleRatingClick = (propertyId, rating) => {
+    setSelectedRating(prev => ({
+      ...prev,
+      [propertyId]: rating
+    }));
+    // Here you would typically send this rating to your backend
+    console.log(`Property ${propertyId} rated: ${rating} stars`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -237,7 +253,7 @@ export default function HostDashboard() {
                           <MapPin className="h-3 w-3" />
                           {property.location}
                         </div>
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between text-sm mb-3">
                           <div className="flex items-center gap-1">
                             <Star className="h-3 w-3 text-yellow-400" />
                             <span className="text-foreground">{property.rating}</span>
@@ -247,7 +263,41 @@ export default function HostDashboard() {
                             <p className="text-muted-foreground">{property.bookings} bookings</p>
                           </div>
                         </div>
-                        <div className="flex gap-2 mt-4">
+                        
+                        {/* 5-star rating hover section - only for property 1 and 3 */}
+                        {property.id !== 2 && (
+                          <div className="mb-3">
+                            <p className="text-xs text-muted-foreground mb-1">Rate this property:</p>
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  className="transition-all duration-200 hover:scale-110"
+                                  onMouseEnter={() => setHoveredRating(prev => ({...prev, [property.id]: star}))}
+                                  onMouseLeave={() => setHoveredRating(prev => ({...prev, [property.id]: 0}))}
+                                  onClick={() => handleRatingClick(property.id, star)}
+                                >
+                                  <Star 
+                                    className={`h-4 w-4 ${
+                                      star <= (selectedRating[property.id] || 0)
+                                        ? 'fill-yellow-400 text-yellow-400'
+                                        : star <= (hoveredRating[property.id] || 0)
+                                        ? 'fill-yellow-400/70 text-yellow-400/70'
+                                        : 'text-muted-foreground/50'
+                                    }`}
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                            {selectedRating[property.id] && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                You rated: {selectedRating[property.id]} stars
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="flex gap-2">
                           <Button variant="outline" size="sm" className="flex-1 bg-transparent">
                             Edit
                           </Button>
