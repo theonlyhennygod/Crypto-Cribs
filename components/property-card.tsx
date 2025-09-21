@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Star, MapPin, Users, Wifi, Car, Coffee, Heart } from "lucide-react"
+import { Star, MapPin, Users, Wifi, Car, Coffee, Heart, ChevronLeft, ChevronRight } from "lucide-react"
 import { useState } from "react"
 
 interface PropertyCardProps {
@@ -34,16 +34,42 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
   const savings = property.originalPrice ? property.originalPrice - property.price : 0
 
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % property.images.length)
+  }
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length)
+  }
+
   return (
     <motion.div whileHover={{ y: -8, scale: 1.02 }} transition={{ duration: 0.3 }}>
       <Card className="overflow-hidden bg-card border-border hover:border-primary/20 transition-all duration-300 group">
         {/* Image Carousel */}
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[4/3] overflow-hidden group">
           <img
             src={property.images[currentImageIndex] || "/placeholder.svg"}
             alt={property.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
+
+          {/* Navigation Arrows */}
+          {property.images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-200 opacity-0 group-hover:opacity-100"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-200 opacity-0 group-hover:opacity-100"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </>
+          )}
 
           {/* Image Navigation Dots */}
           {property.images.length > 1 && (
