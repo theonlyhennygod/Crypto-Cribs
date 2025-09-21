@@ -74,16 +74,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, connectionStatus: "connecting", error: null }))
 
       if (!window.ethereum) {
-        throw new Error("MetaMask not installed")
+        throw new Error("MetaMask not installed. Please install MetaMask browser extension.")
       }
 
-      // Request account access
-      const accounts = await window.ethereum.request({
+      // Add timeout to prevent hanging
+      const timeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Connection timeout - please try again")), 15000)
+      )
+
+      // Request account access with timeout
+      const accountsPromise = window.ethereum.request({
         method: "eth_requestAccounts",
       })
 
-      if (accounts.length === 0) {
-        throw new Error("No accounts found")
+      const accounts = await Promise.race([accountsPromise, timeout])
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error("No accounts found - please unlock MetaMask")
       }
 
       // Switch to Flare Network (Chain ID: 14)
@@ -114,12 +121,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Get balance
-      const balance = await window.ethereum.request({
+      // Get balance with timeout
+      const balancePromise = window.ethereum.request({
         method: "eth_getBalance",
         params: [accounts[0], "latest"],
       })
 
+      const balance = await Promise.race([balancePromise, timeout])
       const balanceInEth = (Number.parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4)
 
       setState((prev) => ({
@@ -148,26 +156,39 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       // Check if Gem Wallet is installed
       if (!window.gemWallet) {
-        throw new Error("Gem Wallet not installed")
+        throw new Error("Gem Wallet not installed. Please install the Gem Wallet browser extension.")
       }
 
-      // Request connection
-      const response = await window.gemWallet.request({
+      // Add timeout to prevent hanging
+      const timeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Connection timeout - please try again")), 15000)
+      )
+
+      // Request connection with timeout
+      const responsePromise = window.gemWallet.request({
         method: "wallet_requestPermissions",
         params: [{ wallet_selection: { network: "XRPL" } }],
       })
 
-      if (!response.result) {
-        throw new Error("Connection rejected")
+      const response = await Promise.race([responsePromise, timeout])
+
+      if (!response || !response.result) {
+        throw new Error("Connection rejected or failed")
       }
 
-      // Get account info
-      const accountInfo = await window.gemWallet.request({
+      // Get account info with timeout
+      const accountInfoPromise = window.gemWallet.request({
         method: "account_info",
         params: {},
       })
 
-      const xrpBalance = (accountInfo.balance / 1000000).toFixed(2)
+      const accountInfo = await Promise.race([accountInfoPromise, timeout])
+
+      if (!accountInfo || !accountInfo.account) {
+        throw new Error("Failed to get account information")
+      }
+
+      const xrpBalance = accountInfo.balance ? (accountInfo.balance / 1000000).toFixed(2) : "0.00"
 
       setState((prev) => ({
         ...prev,
@@ -328,9 +349,24 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, error: null }))
   }
 
+  // Connection timeout reset
+  useEffect(() => {
+    if (state.connectionStatus === "connecting") {
+      const timeout = setTimeout(() => {
+        setState((prev) => ({
+          ...prev,
+          connectionStatus: "error",
+          error: "Connection timeout - please try again"
+        }))
+      }, 30000) // 30 second timeout
+
+      return () => clearTimeout(timeout)
+    }
+  }, [state.connectionStatus])
+
   // Listen for account changes
   useEffect(() => {
-    if (window.ethereum) {
+    if (typeof window !== 'undefined' && window.ethereum) {
       const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length === 0) {
           disconnectWallet("metamask")

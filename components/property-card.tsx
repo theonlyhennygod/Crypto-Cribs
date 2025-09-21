@@ -23,20 +23,137 @@ interface PropertyCardProps {
     images: string[]
     amenities: string[]
     host: string
+    hostWallet?: string
     isVerified: boolean
     discount?: number
+    instantBook?: boolean
+    tags?: string[]
   }
+  viewMode?: "grid" | "list"
 }
 
-export function PropertyCard({ property }: PropertyCardProps) {
+export function PropertyCard({ property, viewMode = "grid" }: PropertyCardProps) {
   const [isFavorited, setIsFavorited] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   const savings = property.originalPrice ? property.originalPrice - property.price : 0
 
+  if (viewMode === "list") {
+    return (
+      <motion.div whileHover={{ scale: 1.01 }} transition={{ duration: 0.3 }}>
+        <Card className="overflow-hidden bg-card border-border hover:border-primary/20 transition-all duration-300 group">
+          <div className="flex flex-col md:flex-row">
+            {/* Image */}
+            <div className="relative md:w-80 aspect-[4/3] md:aspect-square overflow-hidden">
+              <img
+                src={property.images[currentImageIndex] || "/placeholder.svg"}
+                alt={property.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              
+              {/* Badges */}
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
+                {property.discount && (
+                  <Badge className="bg-green-500 hover:bg-green-600 text-white">
+                    -{property.discount}%
+                  </Badge>
+                )}
+                {property.instantBook && (
+                  <Badge variant="secondary">
+                    Instant Book
+                  </Badge>
+                )}
+              </div>
+
+              {/* Favorite Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-600 hover:text-red-500"
+                onClick={() => setIsFavorited(!isFavorited)}
+              >
+                <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+              </Button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 p-6">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h3 className="text-lg font-semibold mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                    {property.title}
+                  </h3>
+                  <div className="flex items-center text-muted-foreground text-sm mb-2">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    {property.location}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold">
+                      {property.price} {property.currency}
+                    </span>
+                    {property.originalPrice && (
+                      <span className="text-sm text-muted-foreground line-through">
+                        {property.originalPrice}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-muted-foreground">per night</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                <div className="flex items-center">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                  {property.rating} ({property.reviews} reviews)
+                </div>
+                <div className="flex items-center">
+                  <Users className="h-4 w-4 mr-1" />
+                  {property.guests} guests
+                </div>
+                <div>{property.bedrooms} bed • {property.bathrooms} bath</div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {property.amenities.slice(0, 4).map((amenity) => (
+                  <Badge key={amenity} variant="outline" className="text-xs">
+                    {amenity}
+                  </Badge>
+                ))}
+                {property.amenities.length > 4 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{property.amenities.length - 4} more
+                  </Badge>
+                )}
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="text-sm">
+                  <span className="text-muted-foreground">Hosted by </span>
+                  <span className="font-medium">{property.host}</span>
+                  {property.isVerified && (
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      ✓ Verified
+                    </Badge>
+                  )}
+                </div>
+                <Button asChild>
+                  <a href={`/property/${property.id}`}>
+                    View Details
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div whileHover={{ y: -8, scale: 1.02 }} transition={{ duration: 0.3 }}>
-      <Card className="overflow-hidden bg-card border-border hover:border-primary/20 transition-all duration-300 group">
+      <Card className="overflow-hidden bg-card border-border hover:border-primary/20 transition-all duration-300 group h-full flex flex-col">
         {/* Image Carousel */}
         <div className="relative aspect-[4/3] overflow-hidden">
           <img
@@ -68,20 +185,27 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <Heart className={`h-4 w-4 ${isFavorited ? "fill-red-500 text-red-500" : "text-white"}`} />
           </button>
 
-          {/* Discount Badge */}
-          {property.discount && (
-            <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">-{property.discount}%</Badge>
-          )}
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
+            {property.discount && (
+              <Badge className="bg-primary text-primary-foreground">-{property.discount}%</Badge>
+            )}
+            {property.instantBook && (
+              <Badge variant="secondary" className="bg-blue-500/90 text-white">
+                Instant Book
+              </Badge>
+            )}
+          </div>
 
           {/* Verified Badge */}
           {property.isVerified && (
             <Badge variant="secondary" className="absolute bottom-3 right-3 bg-green-500/90 text-white">
-              Verified
+              ✓ Verified
             </Badge>
           )}
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 flex-grow flex flex-col">
           {/* Location & Rating */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 text-muted-foreground">
@@ -96,7 +220,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="text-lg font-semibold line-clamp-2 group-hover:text-primary transition-colors h-14 flex items-center">
             {property.title}
           </h3>
 
@@ -111,7 +235,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
 
           {/* Amenities */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2 flex-grow min-h-[2rem]">
             {property.amenities.slice(0, 3).map((amenity) => {
               const icons: Record<string, any> = {
                 WiFi: Wifi,
@@ -132,7 +256,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
 
           {/* Pricing */}
-          <div className="space-y-2">
+          <div className="space-y-2 mt-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold text-primary">
