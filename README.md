@@ -2,15 +2,6 @@
 
 ---
 
-## 🚀 Demo Video
-
-<!--
-Replace the link below with your YouTube/Vimeo/Loom/Google Drive demo video
--->
-[![Watch the demo]([https://youtu.be/PkxyhYXvY-I])
-
----
-
 ## 🖼️ Screenshots
 
 <!--
